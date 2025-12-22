@@ -1,0 +1,27 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {},
+  "overrides": [
+    {
+      "files": [
+        "webpack.*.js",
+        "webpack.common.js",
+        "webpack.dev.js",
+        "webpack.prod.js"
+      ],
+      "env": {
+        "node": true,
+        "browser": false
+      },
+      "rules": {}
+    }
+  ]
+}
