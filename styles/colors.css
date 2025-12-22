@@ -1,0 +1,16 @@
+:root {
+  --bg-primary: #1e1e2f;
+  --bg-secondary: #2c2c3a;
+
+  --accent-primary: #ff4c4c;
+  --accent-secondary: #ffc947;
+
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0b0;
+
+  /* Players*/
+  --player1: #4cdfff;
+  --player2: #6fff4c;
+  --player3: #ff6fff;
+  --player4: #ffb84c;
+}

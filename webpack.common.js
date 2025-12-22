@@ -17,7 +17,7 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.svg$/i,
+        test: /\.(png|jpe?g|gif|webp|ico|svg)$/i,
         type: 'asset/resource',
       },
     ],
@@ -26,6 +26,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
+      favicon: './resources/logosmall.ico',
     }),
   ],
 };

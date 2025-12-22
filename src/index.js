@@ -1,2 +1,4 @@
-const content = document.getElementById('content');
-content.textContent = 'hello world';
+import '../styles/general-styles.css';
+import { renderMain } from './renderMain';
+
+renderMain();

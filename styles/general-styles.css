@@ -1,6 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Stack+Sans+Headline:wght@200..700&display=swap');
+@import './colors.css';
 
 * {
   margin: 0;
   font-family: 'Stack Sans Headline', sans-serif;
+  background-color: var(--bg-primary);
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  padding: 0px 10px 0px 10px;
 }
