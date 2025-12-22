@@ -11,4 +11,10 @@ export function renderMain() {
   mainLogoDom.id = 'mainLogo_id';
   mainLogoDom.src = logo;
   root.appendChild(mainLogoDom);
+
+  // MAIN TITLE
+  const titleDOM = document.createElement('div');
+  titleDOM.id = 'title_id';
+  titleDOM.textContent = 'Empieza a jugar por la Vila';
+  root.appendChild(titleDOM);
 }

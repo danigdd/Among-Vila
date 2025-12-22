@@ -1,4 +1,14 @@
+@import './colors.css';
 #mainLogo_id {
   object-fit: fill;
   max-width: 350px;
+}
+
+#title_id {
+  color: var(--text-primary);
+  font-size: 30px;
+  font-weight: 300;
+  margin-top: 30px;
+  text-align: center;
+  max-width: 300px;
 }
