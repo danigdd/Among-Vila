@@ -1,6 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Stack+Sans+Headline:wght@200..700&display=swap');
 @import './colors.css';
 
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 100;
+    transform: translateY(0);
+  }
+}
 * {
   margin: 0;
   font-family: 'Stack Sans Headline', sans-serif;
@@ -13,4 +23,6 @@
   justify-content: start;
   align-items: center;
   padding: 100px 10px 100px 10px;
+  animation-name: fadeUp;
+  animation-duration: 2s;
 }

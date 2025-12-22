@@ -13,8 +13,14 @@ export function renderMain() {
   root.appendChild(mainLogoDom);
 
   // MAIN TITLE
-  const titleDOM = document.createElement('div');
-  titleDOM.id = 'title_id';
-  titleDOM.textContent = 'Empieza a jugar por la Vila';
-  root.appendChild(titleDOM);
+  const titleGameDescriptionDOM = document.createElement('div');
+  titleGameDescriptionDOM.id = 'titleGameDescription_id';
+  titleGameDescriptionDOM.textContent = 'Empieza a jugar por la Vila';
+  root.appendChild(titleGameDescriptionDOM);
+
+  // PLAY BUTTON
+  const playButtonDOM = document.createElement('button');
+  playButtonDOM.id = 'playButton_id';
+  playButtonDOM.textContent = 'Juega ya';
+  root.appendChild(playButtonDOM);
 }

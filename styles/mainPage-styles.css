@@ -4,11 +4,29 @@
   max-width: 350px;
 }
 
-#title_id {
+#titleGameDescription_id {
   color: var(--text-primary);
   font-size: 30px;
   font-weight: 300;
-  margin-top: 30px;
+  margin-top: 50px;
   text-align: center;
   max-width: 300px;
+}
+
+#playButton_id {
+  margin-top: 80px;
+  max-width: 350px;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 50px 15px 50px;
+  font-size: 30px;
+  color: var(--text-secondary);
+  background-color: var(--bg-button);
+  transition-property: opacity;
+  transition-duration: 0.2s;
+}
+
+#playButton_id:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
