@@ -1,5 +1,6 @@
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
+import { settingsRestraints } from '../utils/utils';
 import logo from '../resources/logofull.webp';
 
 export function renderCreateGame() {
@@ -71,11 +72,15 @@ export function renderCreateGame() {
 
   // EVENT LISTENERS FOR EACH BUTTON
   numberPlayersSelectorLessDOM.addEventListener('click', () => {
+    if (!settingsRestraints('players', numberPlayersSelectorCount, 'less'))
+      return;
     numberPlayersSelectorCount -= 1;
     numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
   });
 
   numberPlayersSelectorMoreDOM.addEventListener('click', () => {
+    if (!settingsRestraints('players', numberPlayersSelectorCount, 'more'))
+      return;
     numberPlayersSelectorCount += 1;
     numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
   });
