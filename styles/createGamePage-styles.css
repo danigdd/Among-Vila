@@ -54,9 +54,16 @@
   border: none;
   background-color: none;
   font-size: 30px;
+  color: var(--text-primary);
+}
+
+.selectorDOM button:hover {
+  cursor: pointer;
 }
 
 .selectorDOM div {
   color: var(--text-primary);
   font-size: 30px;
+  margin-left: 10px;
+  margin-right: 10px;
 }

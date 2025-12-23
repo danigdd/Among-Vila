@@ -29,6 +29,8 @@ export function renderCreateGame() {
   root.appendChild(settingsWrapperDOM);
 
   // INDIVIDUAL SETTINGS
+
+  // ======== NUMBER OF PLAYERS ========
   const numberPlayersDOM = document.createElement('div');
   numberPlayersDOM.id = 'numberPlayers_id';
   numberPlayersDOM.className = 'individualSettingDOM';
@@ -61,7 +63,17 @@ export function renderCreateGame() {
   numberPlayersSelectorMoreDOM.textContent = '>';
   numberPlayersSelectorDOM.appendChild(numberPlayersSelectorMoreDOM);
 
-  // INDIVIDUAL SETTING
+  // EVENT LISTENERS FOR EACH BUTTON
+  numberPlayersSelectorLessDOM.addEventListener('click', () => {
+    numberPlayersSelectorCount -= 1;
+    numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
+  });
+
+  numberPlayersSelectorMoreDOM.addEventListener('click', () => {
+    numberPlayersSelectorCount += 1;
+    numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
+  });
+
   const numberImpostorsDOM = document.createElement('div');
   numberImpostorsDOM.id = 'numberImpostors_id';
   numberImpostorsDOM.className = 'individualSettingDOM';
