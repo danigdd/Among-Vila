@@ -34,8 +34,14 @@ export function renderCreateGame() {
   const numberPlayersDOM = document.createElement('div');
   numberPlayersDOM.id = 'numberPlayers_id';
   numberPlayersDOM.className = 'individualSettingDOM';
-  numberPlayersDOM.textContent = 'Jugadores';
   settingsWrapperDOM.appendChild(numberPlayersDOM);
+
+  // TEXT
+  const numberPlayersText = document.createElement('div');
+  numberPlayersText.id = 'numberPlayersText_id';
+  numberPlayersText.textContent = 'Jugadores';
+  numberPlayersText.className = 'settingName';
+  numberPlayersDOM.appendChild(numberPlayersText);
 
   // SELECTOR
 
@@ -74,9 +80,53 @@ export function renderCreateGame() {
     numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
   });
 
+  // ======== NUMBER OF IMPOSTORS ========
   const numberImpostorsDOM = document.createElement('div');
   numberImpostorsDOM.id = 'numberImpostors_id';
   numberImpostorsDOM.className = 'individualSettingDOM';
-  numberImpostorsDOM.textContent = 'Impostores';
   settingsWrapperDOM.appendChild(numberImpostorsDOM);
+
+  // TEXT
+  const numberImpostorsText = document.createElement('div');
+  numberImpostorsText.id = 'numberImpostorsText_id';
+  numberImpostorsText.textContent = 'Impostores';
+  numberImpostorsText.className = 'settingName';
+  numberImpostorsDOM.appendChild(numberImpostorsText);
+
+  // SELECTOR
+
+  const numberImpostorsSelectorDOM = document.createElement('div');
+  numberImpostorsSelectorDOM.id = 'numberImpostorsSelector_id';
+  numberImpostorsSelectorDOM.className = 'selectorDOM';
+  numberImpostorsDOM.appendChild(numberImpostorsSelectorDOM);
+
+  // SELECTOR '<'
+  const numberImpostorsSelectorLessDOM = document.createElement('button');
+  numberImpostorsSelectorLessDOM.id = 'numberImpostorsSelectorLess_id';
+  numberImpostorsSelectorLessDOM.textContent = '<';
+  numberImpostorsSelectorDOM.appendChild(numberImpostorsSelectorLessDOM);
+
+  // ACTUAL SELECTOR COUNT
+  let numberImpostorsSelectorCount = 0;
+  const numberImpostorsSelectorCountDOM = document.createElement('div');
+  numberImpostorsSelectorCountDOM.id = 'numberImpostorsSelectorCount_id';
+  numberImpostorsSelectorCountDOM.textContent = `${numberImpostorsSelectorCount}`;
+  numberImpostorsSelectorDOM.appendChild(numberImpostorsSelectorCountDOM);
+
+  // SELECTOR '>'
+  const numberImpostorsSelectorMoreDOM = document.createElement('button');
+  numberImpostorsSelectorMoreDOM.id = 'numberImpostorsSelectorMore_id';
+  numberImpostorsSelectorMoreDOM.textContent = '>';
+  numberImpostorsSelectorDOM.appendChild(numberImpostorsSelectorMoreDOM);
+
+  // EVENT LISTENERS FOR EACH BUTTON
+  numberImpostorsSelectorLessDOM.addEventListener('click', () => {
+    numberImpostorsSelectorCount -= 1;
+    numberImpostorsSelectorCountDOM.textContent = `${numberImpostorsSelectorCount}`;
+  });
+
+  numberImpostorsSelectorMoreDOM.addEventListener('click', () => {
+    numberImpostorsSelectorCount += 1;
+    numberImpostorsSelectorCountDOM.textContent = `${numberImpostorsSelectorCount}`;
+  });
 }

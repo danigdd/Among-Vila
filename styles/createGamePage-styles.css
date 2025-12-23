@@ -40,8 +40,11 @@
   flex-direction: row;
   color: var(--text-secondary);
   font-size: 30px;
-  gap: 80px;
   margin-bottom: 40px;
+}
+
+.individualSettingDOM .settingName {
+  width: 200px;
 }
 
 .selectorDOM {
