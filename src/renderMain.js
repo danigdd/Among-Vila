@@ -1,5 +1,6 @@
 import '../styles/general-styles.css';
 import '../styles/mainPage-styles.css';
+import { renderCreateGame } from './renderCreateGame';
 import logo from '../resources/logofull.webp';
 
 export function renderMain() {
@@ -37,6 +38,10 @@ export function renderMain() {
     createGameDOM.id = 'createGame_id';
     createGameDOM.textContent = 'Crear partida';
     tableOptionsWrapperDOM.appendChild(createGameDOM);
+
+    createGameDOM.addEventListener('click', () => {
+      renderCreateGame();
+    });
 
     // JOIN GAME BUTTON
     const joinGameDOM = document.createElement('button');

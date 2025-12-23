@@ -1,0 +1,32 @@
+@import './colors.css';
+
+@keyframes fadeUpSlow {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 100;
+    transform: translateY(0);
+  }
+}
+
+#createGameLogo_id {
+  object-fit: fill;
+  max-width: 200px;
+  margin-top: -30px;
+}
+
+#createGameText_id {
+  color: var(--text-primary);
+  font-size: 30px;
+  font-weight: 300;
+  margin-top: 50px;
+  text-align: center;
+  max-width: 350px;
+}
+
+#settingsWrapper_id {
+  display: flex;
+  flex-direction: column;
+}

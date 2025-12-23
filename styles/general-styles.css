@@ -26,3 +26,7 @@
   animation-name: fadeUp;
   animation-duration: 2s;
 }
+
+#content.fast-animation {
+  animation: fadeUp 0.8s;
+}
