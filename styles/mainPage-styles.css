@@ -1,4 +1,15 @@
 @import './colors.css';
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 100;
+    transform: translateY(0);
+  }
+}
 #mainLogo_id {
   object-fit: fill;
   max-width: 350px;
@@ -27,6 +38,33 @@
 }
 
 #playButton_id:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+#tableOptionsWrapper_id {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: row;
+  max-width: 350px;
+  gap: 20px;
+  animation: fadeDown 1s;
+}
+
+#tableOptionsWrapper_id button {
+  max-width: 50%;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 30px 15px 30px;
+  font-size: 15px;
+  color: var(--text-primary);
+  background-color: var(--accent-secondary);
+  text-align: center;
+  transition-property: opacity;
+  transition-duration: 0.2s;
+}
+
+#tableOptionsWrapper_id button:hover {
   opacity: 0.8;
   cursor: pointer;
 }

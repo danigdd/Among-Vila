@@ -23,4 +23,27 @@ export function renderMain() {
   playButtonDOM.id = 'playButton_id';
   playButtonDOM.textContent = 'Juega ya';
   root.appendChild(playButtonDOM);
+  let optionsAlreadyDisplayed = false;
+  // LISTENER FOR DEPLOYING GAME TABLE OPTIONS
+  playButtonDOM.addEventListener('click', () => {
+    if (optionsAlreadyDisplayed) return;
+    // FLEX HORITZONTAL DIV SETTINGS
+    const tableOptionsWrapperDOM = document.createElement('div');
+    tableOptionsWrapperDOM.id = 'tableOptionsWrapper_id';
+    root.appendChild(tableOptionsWrapperDOM);
+
+    // CREATE GAME BUTTON
+    const createGameDOM = document.createElement('button');
+    createGameDOM.id = 'createGame_id';
+    createGameDOM.textContent = 'Crear partida';
+    tableOptionsWrapperDOM.appendChild(createGameDOM);
+
+    // JOIN GAME BUTTON
+    const joinGameDOM = document.createElement('button');
+    joinGameDOM.id = 'joinGame_id';
+    joinGameDOM.textContent = 'Unirse a partida';
+    tableOptionsWrapperDOM.appendChild(joinGameDOM);
+
+    optionsAlreadyDisplayed = true;
+  });
 }
