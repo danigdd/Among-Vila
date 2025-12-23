@@ -29,4 +29,34 @@
 #settingsWrapper_id {
   display: flex;
   flex-direction: column;
+  margin-top: 40px;
+  padding: 10px 30px 10px 30px;
+  max-width: 320px;
+  align-items: start;
+}
+
+.individualSettingDOM {
+  display: flex;
+  flex-direction: row;
+  color: var(--text-secondary);
+  font-size: 30px;
+  gap: 80px;
+  margin-bottom: 40px;
+}
+
+.selectorDOM {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.selectorDOM button {
+  border: none;
+  background-color: none;
+  font-size: 30px;
+}
+
+.selectorDOM div {
+  color: var(--text-primary);
+  font-size: 30px;
 }
