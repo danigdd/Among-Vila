@@ -32,106 +32,48 @@ export function renderCreateGame() {
   // INDIVIDUAL SETTINGS
 
   // ======== NUMBER OF PLAYERS ========
-  const numberPlayersDOM = document.createElement('div');
-  numberPlayersDOM.id = 'numberPlayers_id';
-  numberPlayersDOM.className = 'individualSettingDOM';
-  settingsWrapperDOM.appendChild(numberPlayersDOM);
-
-  // TEXT
-  const numberPlayersText = document.createElement('div');
-  numberPlayersText.id = 'numberPlayersText_id';
-  numberPlayersText.textContent = 'Jugadores';
-  numberPlayersText.className = 'settingName';
-  numberPlayersDOM.appendChild(numberPlayersText);
-
-  // SELECTOR
-
-  const numberPlayersSelectorDOM = document.createElement('div');
-  numberPlayersSelectorDOM.id = 'numberPlayersSelector_id';
-  numberPlayersSelectorDOM.className = 'selectorDOM';
-  numberPlayersDOM.appendChild(numberPlayersSelectorDOM);
-
-  // SELECTOR '<'
-  const numberPlayersSelectorLessDOM = document.createElement('button');
-  numberPlayersSelectorLessDOM.id = 'numberPlayersSelectorLess_id';
-  numberPlayersSelectorLessDOM.textContent = '<';
-  numberPlayersSelectorDOM.appendChild(numberPlayersSelectorLessDOM);
-
-  // ACTUAL SELECTOR COUNT
-  let numberPlayersSelectorCount = 0;
-  const numberPlayersSelectorCountDOM = document.createElement('div');
-  numberPlayersSelectorCountDOM.id = 'numberPlayersSelectorCount_id';
-  numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
-  numberPlayersSelectorDOM.appendChild(numberPlayersSelectorCountDOM);
-
-  // SELECTOR '>'
-  const numberPlayersSelectorMoreDOM = document.createElement('button');
-  numberPlayersSelectorMoreDOM.id = 'numberPlayersSelectorMore_id';
-  numberPlayersSelectorMoreDOM.textContent = '>';
-  numberPlayersSelectorDOM.appendChild(numberPlayersSelectorMoreDOM);
-
-  // EVENT LISTENERS FOR EACH BUTTON
-  numberPlayersSelectorLessDOM.addEventListener('click', () => {
-    if (!settingsRestraints('players', numberPlayersSelectorCount, 'less'))
-      return;
-    numberPlayersSelectorCount -= 1;
-    numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
-  });
-
-  numberPlayersSelectorMoreDOM.addEventListener('click', () => {
-    if (!settingsRestraints('players', numberPlayersSelectorCount, 'more'))
-      return;
-    numberPlayersSelectorCount += 1;
-    numberPlayersSelectorCountDOM.textContent = `${numberPlayersSelectorCount}`;
-  });
+  createNewSetting(settingsWrapperDOM, 'Jugadores');
 
   // ======== NUMBER OF IMPOSTORS ========
-  const numberImpostorsDOM = document.createElement('div');
-  numberImpostorsDOM.id = 'numberImpostors_id';
-  numberImpostorsDOM.className = 'individualSettingDOM';
-  settingsWrapperDOM.appendChild(numberImpostorsDOM);
+  createNewSetting(settingsWrapperDOM, 'Impostores');
+}
+
+function createNewSetting(settingsWrapperDOM, settingsName) {
+  const numberDOM = document.createElement('div');
+  numberDOM.id = `number${settingsName}_id`;
+  numberDOM.className = 'individualSettingDOM';
+  settingsWrapperDOM.appendChild(numberDOM);
 
   // TEXT
-  const numberImpostorsText = document.createElement('div');
-  numberImpostorsText.id = 'numberImpostorsText_id';
-  numberImpostorsText.textContent = 'Impostores';
-  numberImpostorsText.className = 'settingName';
-  numberImpostorsDOM.appendChild(numberImpostorsText);
+  const numberText = document.createElement('div');
+  numberText.id = `number${settingsName}Text_id`;
+  numberText.textContent = settingsName;
+  numberText.className = 'settingName';
+  numberDOM.appendChild(numberText);
 
   // SELECTOR
 
-  const numberImpostorsSelectorDOM = document.createElement('div');
-  numberImpostorsSelectorDOM.id = 'numberImpostorsSelector_id';
-  numberImpostorsSelectorDOM.className = 'selectorDOM';
-  numberImpostorsDOM.appendChild(numberImpostorsSelectorDOM);
+  const numberSelectorDOM = document.createElement('div');
+  numberSelectorDOM.id = `number${settingsName}Selector_id`;
+  numberSelectorDOM.className = 'selectorDOM';
+  numberDOM.appendChild(numberSelectorDOM);
 
   // SELECTOR '<'
-  const numberImpostorsSelectorLessDOM = document.createElement('button');
-  numberImpostorsSelectorLessDOM.id = 'numberImpostorsSelectorLess_id';
-  numberImpostorsSelectorLessDOM.textContent = '<';
-  numberImpostorsSelectorDOM.appendChild(numberImpostorsSelectorLessDOM);
+  const numberSelectorLessDOM = document.createElement('button');
+  numberSelectorLessDOM.id = `number${settingsName}SelectorLess_id`;
+  numberSelectorLessDOM.textContent = '<';
+  numberSelectorDOM.appendChild(numberSelectorLessDOM);
 
   // ACTUAL SELECTOR COUNT
-  let numberImpostorsSelectorCount = 0;
-  const numberImpostorsSelectorCountDOM = document.createElement('div');
-  numberImpostorsSelectorCountDOM.id = 'numberImpostorsSelectorCount_id';
-  numberImpostorsSelectorCountDOM.textContent = `${numberImpostorsSelectorCount}`;
-  numberImpostorsSelectorDOM.appendChild(numberImpostorsSelectorCountDOM);
+  let numberSelectorCount = 0;
+  const numberSelectorCountDOM = document.createElement('div');
+  numberSelectorCountDOM.id = `number${settingsName}SelectorCount_id`;
+  numberSelectorCountDOM.textContent = `${numberSelectorCount}`;
+  numberSelectorDOM.appendChild(numberSelectorCountDOM);
 
   // SELECTOR '>'
-  const numberImpostorsSelectorMoreDOM = document.createElement('button');
-  numberImpostorsSelectorMoreDOM.id = 'numberImpostorsSelectorMore_id';
-  numberImpostorsSelectorMoreDOM.textContent = '>';
-  numberImpostorsSelectorDOM.appendChild(numberImpostorsSelectorMoreDOM);
-
-  // EVENT LISTENERS FOR EACH BUTTON
-  numberImpostorsSelectorLessDOM.addEventListener('click', () => {
-    numberImpostorsSelectorCount -= 1;
-    numberImpostorsSelectorCountDOM.textContent = `${numberImpostorsSelectorCount}`;
-  });
-
-  numberImpostorsSelectorMoreDOM.addEventListener('click', () => {
-    numberImpostorsSelectorCount += 1;
-    numberImpostorsSelectorCountDOM.textContent = `${numberImpostorsSelectorCount}`;
-  });
+  const numberSelectorMoreDOM = document.createElement('button');
+  numberSelectorMoreDOM.id = `number${settingsName}SelectorMore_id`;
+  numberSelectorMoreDOM.textContent = '>';
+  numberSelectorDOM.appendChild(numberSelectorMoreDOM);
 }
