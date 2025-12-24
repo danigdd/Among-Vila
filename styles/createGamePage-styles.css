@@ -39,12 +39,12 @@
   display: flex;
   flex-direction: row;
   color: var(--text-secondary);
-  font-size: 30px;
-  margin-bottom: 40px;
+  font-size: 25px;
+  margin-bottom: 60px;
 }
 
 .individualSettingDOM .settingName {
-  width: 200px;
+  width: 220px;
 }
 
 .selectorDOM {
@@ -56,7 +56,7 @@
 .selectorDOM button {
   border: none;
   background-color: none;
-  font-size: 30px;
+  font-size: 25px;
   color: var(--text-primary);
 }
 
@@ -66,7 +66,7 @@
 
 .selectorDOM div {
   color: var(--text-primary);
-  font-size: 30px;
+  font-size: 25px;
   margin-left: 10px;
   margin-right: 10px;
   width: 32px;

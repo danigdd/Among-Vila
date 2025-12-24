@@ -1,6 +1,7 @@
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
 import { settingsRestraints } from '../utils/utils';
+import { cleanSettingName } from '../utils/utils';
 import logo from '../resources/logofull.webp';
 
 export function renderCreateGame() {
@@ -36,44 +37,61 @@ export function renderCreateGame() {
 
   // ======== NUMBER OF IMPOSTORS ========
   createNewSetting(settingsWrapperDOM, 'Impostores');
+
+  // ======== NUMBER OF EMERGENCY MEETINGS PER PERSON ========
+  createNewSetting(settingsWrapperDOM, 'Emergencias por jugador');
+
+  // ======== IMPOSTOR COOLDOWN ========
+  createNewSetting(settingsWrapperDOM, 'Cooldown de Asesinato');
+
+  // ======== ANONYMOUS VOTES ========
+  createNewSetting(settingsWrapperDOM, 'Voto anonimo');
+
+  // ======== HIDE TASKS ========
+  createNewSetting(settingsWrapperDOM, 'Ocultar tareas');
+
+  // ======== DISCUSS TIME ========
+  createNewSetting(settingsWrapperDOM, 'Tiempo de discusion');
 }
 
-function createNewSetting(settingsWrapperDOM, settingsName) {
+function createNewSetting(settingsWrapperDOM, settingsRawName) {
+  let settingsName = cleanSettingName(settingsRawName);
+
   const numberDOM = document.createElement('div');
-  numberDOM.id = `number${settingsName}_id`;
+  numberDOM.id = `${settingsName}_id`;
   numberDOM.className = 'individualSettingDOM';
   settingsWrapperDOM.appendChild(numberDOM);
 
   // TEXT
   const numberText = document.createElement('div');
-  numberText.id = `number${settingsName}Text_id`;
-  numberText.textContent = settingsName;
+  numberText.id = `${settingsName}Text_id`;
+  numberText.textContent = settingsRawName;
   numberText.className = 'settingName';
   numberDOM.appendChild(numberText);
 
   // SELECTOR
 
   const numberSelectorDOM = document.createElement('div');
-  numberSelectorDOM.id = `number${settingsName}Selector_id`;
+  numberSelectorDOM.id = `${settingsName}Selector_id`;
   numberSelectorDOM.className = 'selectorDOM';
   numberDOM.appendChild(numberSelectorDOM);
 
   // SELECTOR '<'
   const numberSelectorLessDOM = document.createElement('button');
-  numberSelectorLessDOM.id = `number${settingsName}SelectorLess_id`;
+  numberSelectorLessDOM.id = `${settingsName}SelectorLess_id`;
   numberSelectorLessDOM.textContent = '<';
   numberSelectorDOM.appendChild(numberSelectorLessDOM);
 
   // ACTUAL SELECTOR COUNT
   let numberSelectorCount = 0;
   const numberSelectorCountDOM = document.createElement('div');
-  numberSelectorCountDOM.id = `number${settingsName}SelectorCount_id`;
+  numberSelectorCountDOM.id = `${settingsName}SelectorCount_id`;
   numberSelectorCountDOM.textContent = `${numberSelectorCount}`;
   numberSelectorDOM.appendChild(numberSelectorCountDOM);
 
   // SELECTOR '>'
   const numberSelectorMoreDOM = document.createElement('button');
-  numberSelectorMoreDOM.id = `number${settingsName}SelectorMore_id`;
+  numberSelectorMoreDOM.id = `${settingsName}SelectorMore_id`;
   numberSelectorMoreDOM.textContent = '>';
   numberSelectorDOM.appendChild(numberSelectorMoreDOM);
 }

@@ -17,3 +17,9 @@ export function settingsRestraints(setting, value, comparator) {
       return true;
   }
 }
+
+export function cleanSettingName(rawName) {
+  let cleanName = rawName.toLowerCase();
+  cleanName = cleanName.replace(/\s+/g, '');
+  return cleanName;
+}
