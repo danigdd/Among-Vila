@@ -1,6 +1,5 @@
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
-import { settingsRestraints } from '../utils/utils';
 import { cleanSettingName } from '../utils/utils';
 import logo from '../resources/logofull.webp';
 
