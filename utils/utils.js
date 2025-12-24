@@ -1,21 +1,14 @@
-export function settingsRestraints(setting, value, comparator) {
-  switch (setting) {
-    case 'players':
-      if (
-        (value - 1 < 0 && comparator == 'less') ||
-        (value + 1 > 14 && comparator == 'more')
-      )
-        return false;
-      return true;
+export function maxImpostorsForPlayers(players) {
+  if (players <= 6) return 1;
+  if (players <= 9) return 2;
+  if (players <= 13) return 3;
+  return 4; // 14
+}
 
-    case 'impostors':
-      if (
-        value + 1 > document.getElementById('numberPlayersSelectorCount_id') &&
-        comparator == 'more'
-      )
-        return false;
-      return true;
-  }
+export function clampImpostorsToPlayers(players, impostors) {
+  const max = maxImpostorsForPlayers(players);
+  if (impostors > max) return max;
+  return impostors;
 }
 
 export function cleanSettingName(rawName) {

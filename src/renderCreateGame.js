@@ -1,7 +1,10 @@
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
-import { cleanSettingName } from '../utils/utils';
-import { allSettings } from './settingsRestraints';
+import {
+  maxImpostorsForPlayers,
+  clampImpostorsToPlayers,
+  cleanSettingName,
+} from '../utils/utils';
 import logo from '../resources/logofull.webp';
 
 export function renderCreateGame() {
@@ -30,7 +33,7 @@ export function renderCreateGame() {
   settingsWrapperDOM.id = 'settingsWrapper_id';
   root.appendChild(settingsWrapperDOM);
 
-  // INDIVIDUAL SETTINGS
+  // ==================== INDIVIDUAL SETTINGS ====================
 
   // ======== NUMBER OF PLAYERS ========
   createNewSetting(settingsWrapperDOM, 'Jugadores');
@@ -40,24 +43,71 @@ export function renderCreateGame() {
   const selectorCountPlayers = playerSelectorChildren[1];
   const selectorMorePlayers = playerSelectorChildren[2];
 
-  selectorLessPlayers.addEventListener('click', () => {
-    let currentIndex = +selectorCountPlayers.textContent - 1;
-    if (currentIndex - 1 == -1) currentIndex = allSettings[0].length - 1;
-    else currentIndex -= 1;
+  selectorMorePlayers.addEventListener('click', () => {
+    let current = +selectorCountPlayers.textContent;
 
-    selectorCountPlayers.textContent = currentIndex + 1;
+    if (current === 14) current = 1;
+    else current += 1;
+
+    selectorCountPlayers.textContent = current;
+
+    const fixedImpostors = clampImpostorsToPlayers(
+      current,
+      +selectorCountImpostors.textContent
+    );
+
+    selectorCountImpostors.textContent = fixedImpostors;
   });
 
-  selectorMorePlayers.addEventListener('click', () => {
-    let currentIndex = +selectorCountPlayers.textContent - 1;
-    if (currentIndex + 1 == 14) currentIndex = 0;
-    else currentIndex += 1;
+  selectorLessPlayers.addEventListener('click', () => {
+    let current = +selectorCountPlayers.textContent;
 
-    selectorCountPlayers.textContent = currentIndex + 1;
+    if (current === 1) current = 14;
+    else current -= 1;
+
+    selectorCountPlayers.textContent = current;
+    const fixedImpostors = clampImpostorsToPlayers(
+      current,
+      +selectorCountImpostors.textContent
+    );
+
+    selectorCountImpostors.textContent = fixedImpostors;
+
+    clampImpostorsToPlayers();
   });
 
   // ======== NUMBER OF IMPOSTORS ========
   createNewSetting(settingsWrapperDOM, 'Impostores');
+
+  const impostorSelectorDOM = document.getElementById('impostoresSelector_id');
+  const impostorSelectorChildren = impostorSelectorDOM.children;
+  const selectorLessImpostors = impostorSelectorChildren[0];
+  const selectorCountImpostors = impostorSelectorChildren[1];
+  const selectorMoreImpostors = impostorSelectorChildren[2];
+
+  selectorMoreImpostors.addEventListener('click', () => {
+    const players = +selectorCountPlayers.textContent;
+    const max = maxImpostorsForPlayers(players);
+
+    let current = +selectorCountImpostors.textContent;
+
+    if (current === max) current = 1;
+    else current += 1;
+
+    selectorCountImpostors.textContent = current;
+  });
+
+  selectorLessImpostors.addEventListener('click', () => {
+    const players = +selectorCountPlayers.textContent;
+    const max = maxImpostorsForPlayers(players);
+
+    let current = +selectorCountImpostors.textContent;
+
+    if (current === 1) current = max;
+    else current -= 1;
+
+    selectorCountImpostors.textContent = current;
+  });
 
   // ======== NUMBER OF EMERGENCY MEETINGS PER PERSON ========
   createNewSetting(settingsWrapperDOM, 'Emergencias por jugador');
