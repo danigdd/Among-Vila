@@ -1,6 +1,7 @@
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
 import { cleanSettingName } from '../utils/utils';
+import { allSettings } from './settingsRestraints';
 import logo from '../resources/logofull.webp';
 
 export function renderCreateGame() {
@@ -33,6 +34,24 @@ export function renderCreateGame() {
 
   // ======== NUMBER OF PLAYERS ========
   createNewSetting(settingsWrapperDOM, 'Jugadores');
+  const playerSelectorDOM = document.getElementById('jugadoresSelector_id');
+  const playerSelectorChildren = playerSelectorDOM.children;
+
+  playerSelectorChildren[0].addEventListener('click', () => {
+    let currentIndex = +playerSelectorChildren[1].textContent - 1;
+    if (currentIndex - 1 == -1) currentIndex = allSettings[0].length - 1;
+    else currentIndex -= 1;
+
+    playerSelectorChildren[1].textContent = currentIndex + 1;
+  });
+
+  playerSelectorChildren[2].addEventListener('click', () => {
+    let currentIndex = +playerSelectorChildren[1].textContent - 1;
+    if (currentIndex + 1 == 14) currentIndex = 0;
+    else currentIndex += 1;
+
+    playerSelectorChildren[1].textContent = currentIndex + 1;
+  });
 
   // ======== NUMBER OF IMPOSTORS ========
   createNewSetting(settingsWrapperDOM, 'Impostores');
@@ -82,7 +101,7 @@ function createNewSetting(settingsWrapperDOM, settingsRawName) {
   numberSelectorDOM.appendChild(numberSelectorLessDOM);
 
   // ACTUAL SELECTOR COUNT
-  let numberSelectorCount = 0;
+  let numberSelectorCount = 1;
   const numberSelectorCountDOM = document.createElement('div');
   numberSelectorCountDOM.id = `${settingsName}SelectorCount_id`;
   numberSelectorCountDOM.textContent = `${numberSelectorCount}`;
