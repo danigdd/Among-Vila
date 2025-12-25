@@ -111,9 +111,60 @@ export function renderCreateGame() {
 
   // ======== NUMBER OF EMERGENCY MEETINGS PER PERSON ========
   createNewSetting(settingsWrapperDOM, 'Emergencias por jugador');
+  const emergenciesSelectorDOM = document.getElementById(
+    'emergenciasporjugadorSelector_id'
+  );
+  const emergenciesSelectorChildren = emergenciesSelectorDOM.children;
+  const selectorLessEmergencies = emergenciesSelectorChildren[0];
+  const selectorCountEmergencies = emergenciesSelectorChildren[1];
+  const selectorMoreEmergencies = emergenciesSelectorChildren[2];
+
+  selectorMoreEmergencies.addEventListener('click', () => {
+    let emergencies = +selectorCountEmergencies.textContent;
+
+    if (emergencies == 3) emergencies = 1;
+    else emergencies += 1;
+
+    selectorCountEmergencies.textContent = emergencies;
+  });
+
+  selectorLessEmergencies.addEventListener('click', () => {
+    let emergencies = +selectorCountEmergencies.textContent;
+
+    if (emergencies == 1) emergencies = 3;
+    else emergencies -= 1;
+
+    selectorCountEmergencies.textContent = emergencies;
+  });
 
   // ======== IMPOSTOR COOLDOWN ========
-  createNewSetting(settingsWrapperDOM, 'Cooldown de Asesinato');
+  createNewSetting(settingsWrapperDOM, 'Cooldown de Asesinato (s)');
+  const murderSelectorDOM = document.getElementById(
+    'cooldowndeasesinato(s)Selector_id'
+  );
+  const murderSelectorChildren = murderSelectorDOM.children;
+  const selectorLessmurder = murderSelectorChildren[0];
+  const selectorCountmurder = murderSelectorChildren[1];
+  selectorCountmurder.textContent = 90;
+  const selectorMoremurder = murderSelectorChildren[2];
+
+  selectorMoremurder.addEventListener('click', () => {
+    let murder = +selectorCountmurder.textContent;
+
+    if (murder == 120) murder = 60;
+    else murder += 30;
+
+    selectorCountmurder.textContent = murder;
+  });
+
+  selectorLessmurder.addEventListener('click', () => {
+    let murder = +selectorCountmurder.textContent;
+
+    if (murder == 60) murder = 120;
+    else murder -= 30;
+
+    selectorCountmurder.textContent = murder;
+  });
 
   // ======== ANONYMOUS VOTES ========
   createNewSetting(settingsWrapperDOM, 'Voto anonimo');

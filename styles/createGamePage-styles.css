@@ -39,7 +39,7 @@
   display: flex;
   flex-direction: row;
   color: var(--text-secondary);
-  font-size: 25px;
+  font-size: 23px;
   margin-bottom: 60px;
 }
 
@@ -56,7 +56,7 @@
 .selectorDOM button {
   border: none;
   background-color: none;
-  font-size: 25px;
+  font-size: 23px;
   color: var(--text-primary);
 }
 
@@ -66,9 +66,9 @@
 
 .selectorDOM div {
   color: var(--text-primary);
-  font-size: 25px;
+  font-size: 23px;
   margin-left: 10px;
   margin-right: 10px;
-  width: 32px;
+  width: 45px;
   text-align: center;
 }
