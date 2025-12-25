@@ -253,6 +253,12 @@ export function renderCreateGame() {
 
     selectorCountdiscussTime.textContent = discussTime;
   });
+
+  // ======== CONTINUE BUTTON ========
+  const selectMapButtonDOM = document.createElement('button');
+  selectMapButtonDOM.id = 'selectMap_id';
+  selectMapButtonDOM.textContent = 'Selección de mapa';
+  root.appendChild(selectMapButtonDOM);
 }
 
 function createNewSetting(settingsWrapperDOM, settingsRawName) {
