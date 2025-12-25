@@ -168,12 +168,91 @@ export function renderCreateGame() {
 
   // ======== ANONYMOUS VOTES ========
   createNewSetting(settingsWrapperDOM, 'Voto anonimo');
+  const AnonymousVoteSelectorDOM = document.getElementById(
+    'votoanonimoSelector_id'
+  );
+  const AnonymousVoteSelectorChildren = AnonymousVoteSelectorDOM.children;
+  const selectorLessAnonymousVote = AnonymousVoteSelectorChildren[0];
+  const selectorCountAnonymousVote = AnonymousVoteSelectorChildren[1];
+  selectorCountAnonymousVote.textContent = 'Sí';
+  const selectorMoreAnonymousVote = AnonymousVoteSelectorChildren[2];
+
+  selectorMoreAnonymousVote.addEventListener('click', () => {
+    let AnonymousVote = selectorCountAnonymousVote.textContent;
+
+    if (AnonymousVote === 'Sí') AnonymousVote = 'No';
+    else AnonymousVote = 'Sí';
+
+    selectorCountAnonymousVote.textContent = AnonymousVote;
+  });
+
+  selectorLessAnonymousVote.addEventListener('click', () => {
+    let AnonymousVote = selectorCountAnonymousVote.textContent;
+
+    if (AnonymousVote === 'Sí') AnonymousVote = 'No';
+    else AnonymousVote = 'Sí';
+
+    selectorCountAnonymousVote.textContent = AnonymousVote;
+  });
 
   // ======== HIDE TASKS ========
   createNewSetting(settingsWrapperDOM, 'Ocultar tareas');
+  const OcultarTareasVoteSelectorDOM = document.getElementById(
+    'ocultartareasSelector_id'
+  );
+  const OcultarTareasVoteSelectorChildren =
+    OcultarTareasVoteSelectorDOM.children;
+  const selectorLessOcultarTareasVote = OcultarTareasVoteSelectorChildren[0];
+  const selectorCountOcultarTareasVote = OcultarTareasVoteSelectorChildren[1];
+  selectorCountOcultarTareasVote.textContent = 'Sí';
+  const selectorMoreOcultarTareasVote = OcultarTareasVoteSelectorChildren[2];
+
+  selectorMoreOcultarTareasVote.addEventListener('click', () => {
+    let OcultarTareasVote = selectorCountOcultarTareasVote.textContent;
+
+    if (OcultarTareasVote === 'Sí') OcultarTareasVote = 'No';
+    else OcultarTareasVote = 'Sí';
+
+    selectorCountOcultarTareasVote.textContent = OcultarTareasVote;
+  });
+
+  selectorLessOcultarTareasVote.addEventListener('click', () => {
+    let OcultarTareasVote = selectorCountOcultarTareasVote.textContent;
+
+    if (OcultarTareasVote === 'Sí') OcultarTareasVote = 'No';
+    else OcultarTareasVote = 'Sí';
+
+    selectorCountOcultarTareasVote.textContent = OcultarTareasVote;
+  });
 
   // ======== DISCUSS TIME ========
-  createNewSetting(settingsWrapperDOM, 'Tiempo de discusion');
+  createNewSetting(settingsWrapperDOM, 'Tiempo de discusion (s)');
+  const discussTimeSelectorDOM = document.getElementById(
+    'tiempodediscusion(s)Selector_id'
+  );
+  const discussTimeSelectorChildren = discussTimeSelectorDOM.children;
+  const selectorLessdiscussTime = discussTimeSelectorChildren[0];
+  const selectorCountdiscussTime = discussTimeSelectorChildren[1];
+  selectorCountdiscussTime.textContent = 90;
+  const selectorMorediscussTime = discussTimeSelectorChildren[2];
+
+  selectorMorediscussTime.addEventListener('click', () => {
+    let discussTime = +selectorCountdiscussTime.textContent;
+
+    if (discussTime == 120) discussTime = 60;
+    else discussTime += 30;
+
+    selectorCountdiscussTime.textContent = discussTime;
+  });
+
+  selectorLessdiscussTime.addEventListener('click', () => {
+    let discussTime = +selectorCountdiscussTime.textContent;
+
+    if (discussTime == 60) discussTime = 120;
+    else discussTime -= 30;
+
+    selectorCountdiscussTime.textContent = discussTime;
+  });
 }
 
 function createNewSetting(settingsWrapperDOM, settingsRawName) {
