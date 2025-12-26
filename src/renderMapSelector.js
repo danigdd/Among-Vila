@@ -1,6 +1,7 @@
 import '../styles/general-styles.css';
 import '../styles/mapSelector-styles.css';
 import { renderCreateGame } from './renderCreateGame';
+import { blocks } from '../utils/constants';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 
 import logo from '../resources/logofull.webp';
@@ -38,6 +39,36 @@ export function renderMapSelector() {
   mapSelectorTextDOM.textContent = 'Selecciona el mapa';
   mapSelectorTextDOM.className = 'mainText';
   root.appendChild(mapSelectorTextDOM);
+
+  const mapSelectorGrid = document.createElement('div');
+  mapSelectorGrid.id = 'mapSelectorGrid';
+
+  mapSelectorGrid.style.display = 'grid';
+  mapSelectorGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+  mapSelectorGrid.style.gridTemplateRows = 'repeat(5, auto)';
+  mapSelectorGrid.style.gap = '10px';
+  mapSelectorGrid.style.padding = '10px';
+
+  root.appendChild(mapSelectorGrid);
+
+  blocks.forEach((name, index) => {
+    const blockDiv = document.createElement('div');
+    blockDiv.id = `blockSelector_${index}`;
+    blockDiv.className = 'blockDiv';
+
+    const text = document.createElement('span');
+    text.className = 'blockName';
+    text.textContent = name;
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = `checkbox_${index}`;
+
+    blockDiv.appendChild(text);
+    blockDiv.appendChild(checkbox);
+
+    mapSelectorGrid.appendChild(blockDiv);
+  });
 
   // ======== CONTINUE BUTTON ========
   const selectMapButtonDOM = document.createElement('button');
