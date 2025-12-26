@@ -24,6 +24,13 @@
   padding: 5px 10px 5px 10px;
   border-radius: 5px;
   background-color: var(--bg-button);
+  transition-duration: 0.2s;
+  transition-property: opacity;
+}
+
+#returnMainPage_id:hover {
+  opacity: 0.8;
+  cursor: pointer;
 }
 
 #createGameLogo_id {
