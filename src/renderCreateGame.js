@@ -1,5 +1,7 @@
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
+import { renderMain } from './renderMain';
+import arrowLeft from '../resources/back-arrow-icon.svg';
 import {
   maxImpostorsForPlayers,
   clampImpostorsToPlayers,
@@ -15,6 +17,18 @@ export function renderCreateGame() {
   root.classList.add('fast-animation');
 
   oldRoot.replaceWith(root);
+
+  // RETURN BUTTON
+  const returnMainPageDOM = document.createElement('img');
+  returnMainPageDOM.id = 'returnMainPage_id';
+  returnMainPageDOM.src = arrowLeft;
+  returnMainPageDOM.style.objectFit = 'contain';
+  root.appendChild(returnMainPageDOM);
+
+  // EVENT LISTENER FOR RETURNING TO MAIN PAGE
+  returnMainPageDOM.addEventListener('click', () => {
+    renderMain();
+  });
 
   // MAIN LOGO
   const createGameLogoDOM = document.createElement('img');

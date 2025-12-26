@@ -11,10 +11,25 @@
   }
 }
 
+#returnMainPage_id {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: none;
+  margin-top: 50px;
+  align-self: flex-start;
+  margin-top: -50px;
+  margin-left: 20px;
+  padding: 5px 10px 5px 10px;
+  border-radius: 5px;
+  background-color: var(--bg-button);
+}
+
 #createGameLogo_id {
   object-fit: fill;
   max-width: 200px;
-  margin-top: -30px;
+  margin-top: -50px;
 }
 
 #createGameText_id {
