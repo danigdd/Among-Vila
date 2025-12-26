@@ -4,8 +4,10 @@ import { renderCreateGame } from './renderCreateGame';
 import logo from '../resources/logofull.webp';
 
 export function renderMain() {
-  const root = document.getElementById('content');
-  root.innerHTML = '';
+  const oldRoot = document.getElementById('content');
+  const root = document.createElement('div');
+  root.id = 'content';
+  oldRoot.replaceWith(root);
 
   // MAIN LOGO
   const mainLogoDom = document.createElement('img');
