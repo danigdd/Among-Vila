@@ -8,5 +8,7 @@ export const blocks = [
   'Bloque G',
   'Bloque H',
   'Bloque K',
-  'Recepcion/Estudios',
+  'Recepción/Estudios',
+  'Piscina',
+  'Futbol',
 ];

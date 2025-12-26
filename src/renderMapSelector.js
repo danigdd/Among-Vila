@@ -45,7 +45,7 @@ export function renderMapSelector() {
 
   mapSelectorGrid.style.display = 'grid';
   mapSelectorGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-  mapSelectorGrid.style.gridTemplateRows = 'repeat(5, auto)';
+  mapSelectorGrid.style.gridTemplateRows = 'repeat(6, auto)';
   mapSelectorGrid.style.gap = '10px';
   mapSelectorGrid.style.padding = '10px';
 
@@ -60,14 +60,13 @@ export function renderMapSelector() {
     text.className = 'blockName';
     text.textContent = name;
 
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = `checkbox_${index}`;
-
     blockDiv.appendChild(text);
-    blockDiv.appendChild(checkbox);
 
     mapSelectorGrid.appendChild(blockDiv);
+
+    blockDiv.addEventListener('click', () => {
+      blockDiv.classList.toggle('selected');
+    });
   });
 
   // ======== CONTINUE BUTTON ========

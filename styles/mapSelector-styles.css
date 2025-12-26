@@ -10,13 +10,35 @@
   background-color: var(--accent-secondary);
   color: #a0a0b0;
   padding: 8px;
+
+  border: 1px solid transparent;
+  box-sizing: border-box;
+
   border-radius: 8px;
   font-size: 14px;
   text-align: center;
+
+  opacity: 0.6;
+  transition:
+    opacity 0.2s ease,
+    border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.blockDiv:hover {
+  opacity: 1;
+}
+.blockDiv.selected {
+  opacity: 1;
+  border-color: #2ecc71;
 }
 
 .blockName {
   font-size: 18px;
   color: var(--text-secondary);
   background-color: transparent;
+}
+
+.blockDiv.selected .blockName {
+  color: var(--text-primary);
 }
