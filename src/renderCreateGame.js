@@ -8,6 +8,7 @@ import {
   cleanSettingName,
 } from '../utils/utils';
 import logo from '../resources/logofull.webp';
+import { renderMapSelector } from './renderMapSelector';
 
 export function renderCreateGame() {
   const oldRoot = document.getElementById('content');
@@ -39,6 +40,7 @@ export function renderCreateGame() {
   // CREATE GAME TEXT
   const createGameTextDOM = document.createElement('div');
   createGameTextDOM.id = 'createGameText_id';
+  createGameTextDOM.className = 'mainText';
   createGameTextDOM.textContent = 'Selecciona tus ajustes';
   root.appendChild(createGameTextDOM);
 
@@ -273,6 +275,9 @@ export function renderCreateGame() {
   selectMapButtonDOM.id = 'selectMap_id';
   selectMapButtonDOM.textContent = 'Selección de mapa';
   root.appendChild(selectMapButtonDOM);
+  selectMapButtonDOM.addEventListener('click', () => {
+    renderMapSelector();
+  });
 }
 
 function createNewSetting(settingsWrapperDOM, settingsRawName) {

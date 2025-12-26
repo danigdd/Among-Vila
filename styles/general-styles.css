@@ -30,3 +30,12 @@
 #content.fast-animation {
   animation: fadeUp 0.8s;
 }
+
+.mainText {
+  color: var(--text-primary);
+  font-size: 30px;
+  font-weight: 300;
+  margin-top: 50px;
+  text-align: center;
+  max-width: 350px;
+}
