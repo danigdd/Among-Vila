@@ -33,11 +33,19 @@ export function renderGameLobby(id) {
   root.appendChild(createGameLogoDOM);
 
   // CREATE GAME TEXT
-  const createGameTextDOM = document.createElement('div');
-  createGameTextDOM.id = 'createGameText_id';
-  createGameTextDOM.className = 'mainText';
-  createGameTextDOM.textContent = 'Selecciona tus ajustes';
-  root.appendChild(createGameTextDOM);
+  const titleGameLobbyDOM = document.createElement('div');
+  titleGameLobbyDOM.id = 'titleGameLobby_id';
+  titleGameLobbyDOM.className = 'mainText';
+  titleGameLobbyDOM.textContent = 'Comparte el código de sala:';
+  root.appendChild(titleGameLobbyDOM);
+
+  // DISPLAY GAME ID
+  const gameIDDOM = document.createElement('div');
+  gameIDDOM.id = 'gameIDDOM_id';
+  gameIDDOM.className = 'mainText';
+  gameIDDOM.textContent = id;
+  gameIDDOM.style.fontSize = '40px';
+  root.appendChild(gameIDDOM);
 
   console.log(findGameById(id));
 }

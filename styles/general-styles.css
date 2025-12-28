@@ -40,6 +40,14 @@
   max-width: 350px;
 }
 
+.secondaryText {
+  color: var(--text-secondary);
+  font-size: 25px;
+  font-weight: 200;
+  margin-top: 50px;
+  text-align: center;
+  max-width: 350px;
+}
 .createButtons {
   margin-top: 30px;
   max-width: 350px;
