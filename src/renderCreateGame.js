@@ -9,6 +9,7 @@ import {
 } from '../utils/utils';
 import logo from '../resources/logofull.webp';
 import { renderMapSelector } from './renderMapSelector';
+import './createGameController';
 
 export function renderCreateGame() {
   const oldRoot = document.getElementById('content');

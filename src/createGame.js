@@ -5,8 +5,7 @@ export function createGameSettings(
   murderCooldown,
   anonVote,
   hideTasks,
-  discussTime,
-  map
+  discussTime
 ) {
   const gameSettings = {
     numberPlayers,
@@ -16,7 +15,7 @@ export function createGameSettings(
     anonVote,
     hideTasks,
     discussTime,
-    map,
+    id: Math.floor(Math.random() * 900000) + 100000,
   };
 
   return gameSettings;
