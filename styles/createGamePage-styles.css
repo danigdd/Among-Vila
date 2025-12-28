@@ -85,21 +85,3 @@
   width: 45px;
   text-align: center;
 }
-
-#selectMap_id {
-  margin-top: 30px;
-  max-width: 350px;
-  border: none;
-  border-radius: 10px;
-  padding: 15px 30px 15px 30px;
-  font-size: 25px;
-  color: var(--text-secondary);
-  background-color: var(--bg-button);
-  transition-property: opacity;
-  transition-duration: 0.2s;
-}
-
-#selectMap_id:hover {
-  opacity: 0.8;
-  cursor: pointer;
-}

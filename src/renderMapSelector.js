@@ -3,6 +3,7 @@ import '../styles/mapSelector-styles.css';
 import { renderCreateGame } from './renderCreateGame';
 import { blocks } from '../utils/constants';
 import { gamesGlobalController } from './createGameController';
+import { findGameById } from './createGameController';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 
 import logo from '../resources/logofull.webp';
@@ -77,5 +78,21 @@ export function renderMapSelector(id) {
   createFinalGameDOM.textContent = 'Crear sala';
   root.appendChild(createFinalGameDOM);
 
+  createFinalGameDOM.addEventListener('click', () => {
+    let gameSettings = findGameById(id);
+    const selectedMaps = [];
+
+    // get only selected maps
+    blocks.forEach((name, index) => {
+      const blockDiv = document.getElementById(`blockSelector_${index}`);
+      if (blockDiv.classList.contains('selected')) {
+        const text = blockDiv.querySelector('.blockName').textContent;
+        selectedMaps.push(text);
+      }
+    });
+
+    gameSettings['maps'] = selectedMaps;
+    console.log(gamesGlobalController);
+  });
   console.log(gamesGlobalController);
 }
