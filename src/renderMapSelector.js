@@ -2,7 +2,7 @@ import '../styles/general-styles.css';
 import '../styles/mapSelector-styles.css';
 import { renderCreateGame } from './renderCreateGame';
 import { blocks } from '../utils/constants';
-import { gamesGlobalController } from './createGameController';
+import { renderGameLobby } from './renderGameLobby';
 import { findGameById } from './createGameController';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 
@@ -92,7 +92,6 @@ export function renderMapSelector(id) {
     });
 
     gameSettings['maps'] = selectedMaps;
-    console.log(gamesGlobalController);
+    renderGameLobby(id);
   });
-  console.log(gamesGlobalController);
 }
