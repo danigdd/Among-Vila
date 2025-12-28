@@ -9,7 +9,8 @@ import {
 } from '../utils/utils';
 import logo from '../resources/logofull.webp';
 import { renderMapSelector } from './renderMapSelector';
-import './createGameController';
+import { createGameSettings } from './createGame';
+import { addGameToGlobalController } from './createGameController';
 
 export function renderCreateGame() {
   const oldRoot = document.getElementById('content');
@@ -274,10 +275,23 @@ export function renderCreateGame() {
   // ======== CONTINUE BUTTON ========
   const selectMapButtonDOM = document.createElement('button');
   selectMapButtonDOM.id = 'selectMap_id';
+  selectMapButtonDOM.className = 'createButtons';
   selectMapButtonDOM.textContent = 'Selección de mapa';
   root.appendChild(selectMapButtonDOM);
   selectMapButtonDOM.addEventListener('click', () => {
-    renderMapSelector();
+    const gameSettings = createGameSettings(
+      selectorCountPlayers.textContent,
+      selectorCountImpostors.textContent,
+      selectorCountEmergencies.textContent,
+      selectorCountmurder.textContent,
+      selectorCountAnonymousVote.textContent,
+      selectorCountOcultarTareasVote.textContent,
+      selectorCountdiscussTime.textContent
+    );
+
+    addGameToGlobalController(gameSettings);
+
+    renderMapSelector(gameSettings.id);
   });
 }
 

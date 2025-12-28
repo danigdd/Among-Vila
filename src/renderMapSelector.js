@@ -2,11 +2,12 @@ import '../styles/general-styles.css';
 import '../styles/mapSelector-styles.css';
 import { renderCreateGame } from './renderCreateGame';
 import { blocks } from '../utils/constants';
+import { gamesGlobalController } from './createGameController';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 
 import logo from '../resources/logofull.webp';
 
-export function renderMapSelector() {
+export function renderMapSelector(id) {
   const oldRoot = document.getElementById('content');
 
   const root = document.createElement('div');
@@ -70,8 +71,11 @@ export function renderMapSelector() {
   });
 
   // ======== CONTINUE BUTTON ========
-  const selectMapButtonDOM = document.createElement('button');
-  selectMapButtonDOM.id = 'selectMap_id';
-  selectMapButtonDOM.textContent = 'Selección de mapa';
-  root.appendChild(selectMapButtonDOM);
+  const createFinalGameDOM = document.createElement('button');
+  createFinalGameDOM.id = 'createFinalGame_id';
+  createFinalGameDOM.className = 'createButtons';
+  createFinalGameDOM.textContent = 'Crear sala';
+  root.appendChild(createFinalGameDOM);
+
+  console.log(gamesGlobalController);
 }
