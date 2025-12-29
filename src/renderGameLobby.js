@@ -3,6 +3,22 @@ import '../styles/general-styles.css';
 import '../styles/renderGameLobbyPage-styles.css';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 import logo from '../resources/logofull.webp';
+import black from '../resources/PLAYERS/black.png';
+import blue from '../resources/PLAYERS/blue.png';
+import brown from '../resources/PLAYERS/brown.png';
+import cyan from '../resources/PLAYERS/cyan.png';
+import darkgreen from '../resources/PLAYERS/darkgreen.png';
+import darkgrey from '../resources/PLAYERS/darkgrey.png';
+import green from '../resources/PLAYERS/green.png';
+import keylime from '../resources/PLAYERS/keylime.png';
+import lightpurple from '../resources/PLAYERS/lightpurple.png';
+import orange from '../resources/PLAYERS/orange.png';
+import pink from '../resources/PLAYERS/pink.png';
+import purple from '../resources/PLAYERS/purple.png';
+import red from '../resources/PLAYERS/red.png';
+import white from '../resources/PLAYERS/white.png';
+import yellow from '../resources/PLAYERS/yellow.png';
+
 import { findGameById } from './createGameController';
 
 export function renderGameLobby(id) {
@@ -47,5 +63,45 @@ export function renderGameLobby(id) {
   gameIDDOM.style.fontSize = '40px';
   root.appendChild(gameIDDOM);
 
+  // PLAYERS ON TABLE DISPLAY GRID
+  const playersOnTableGrid = document.createElement('div');
+  playersOnTableGrid.id = 'playersOnTableGrid';
+
+  playersOnTableGrid.style.display = 'grid';
+  playersOnTableGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+  playersOnTableGrid.style.gridTemplateRows = 'repeat(4, auto)';
+  playersOnTableGrid.style.gap = '10px';
+  playersOnTableGrid.style.padding = '10px';
+
+  root.appendChild(playersOnTableGrid);
+
+  // not current real players
+  let currentPlayersOnGame = [
+    'black',
+    'blue',
+    'brown',
+    'cyan',
+    'darkgreen',
+    'darkgrey',
+    'green',
+    'keylime',
+    'lightpurple',
+    'orange',
+    'pink',
+    'red',
+    'white',
+    'yellow',
+  ];
+
+  currentPlayersOnGame.forEach((name) => {
+    const playerDivDOM = document.createElement('img');
+    playerDivDOM.id = `playerDivDOM_id_${name}`;
+    playerDivDOM.className = 'playerDivDOM';
+    playerDivDOM.src = name;
+    playerDivDOM.style.objectFit = 'cover';
+    playerDivDOM.style.width = '64px';
+    playerDivDOM.style.height = '64px';
+    playersOnTableGrid.appendChild(playerDivDOM);
+  });
   console.log(findGameById(id));
 }

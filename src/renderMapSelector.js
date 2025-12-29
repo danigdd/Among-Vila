@@ -42,6 +42,7 @@ export function renderMapSelector(id) {
   mapSelectorTextDOM.className = 'mainText';
   root.appendChild(mapSelectorTextDOM);
 
+  // MAP GRID
   const mapSelectorGrid = document.createElement('div');
   mapSelectorGrid.id = 'mapSelectorGrid';
 
