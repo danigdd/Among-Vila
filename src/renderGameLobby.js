@@ -37,8 +37,6 @@ const playerImages = {
   yellow,
 };
 
-import { findGameById } from './createGameController';
-
 export function renderGameLobby(id) {
   const oldRoot = document.getElementById('content');
 
@@ -122,4 +120,13 @@ export function renderGameLobby(id) {
     playerDivDOM.style.height = '64px';
     playersOnTableGrid.appendChild(playerDivDOM);
   });
+
+  // STARTGAME BUTTON
+  const startGameDOM = document.createElement('button');
+  startGameDOM.id = 'startGameButton_id';
+  startGameDOM.className = 'notReady';
+  startGameDOM.textContent = 'Comenzar';
+  root.appendChild(startGameDOM);
+
+  if (currentPlayersOnGame.length > 4) startGameDOM.className = 'ready';
 }
