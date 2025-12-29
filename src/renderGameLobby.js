@@ -19,6 +19,24 @@ import red from '../resources/PLAYERS/red.png';
 import white from '../resources/PLAYERS/white.png';
 import yellow from '../resources/PLAYERS/yellow.png';
 
+const playerImages = {
+  black,
+  blue,
+  brown,
+  cyan,
+  darkgreen,
+  darkgrey,
+  green,
+  keylime,
+  lightpurple,
+  orange,
+  pink,
+  purple,
+  red,
+  white,
+  yellow,
+};
+
 import { findGameById } from './createGameController';
 
 export function renderGameLobby(id) {
@@ -70,8 +88,9 @@ export function renderGameLobby(id) {
   playersOnTableGrid.style.display = 'grid';
   playersOnTableGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
   playersOnTableGrid.style.gridTemplateRows = 'repeat(4, auto)';
-  playersOnTableGrid.style.gap = '10px';
+  playersOnTableGrid.style.gap = '25px';
   playersOnTableGrid.style.padding = '10px';
+  playersOnTableGrid.style.marginTop = '40px';
 
   root.appendChild(playersOnTableGrid);
 
@@ -97,11 +116,10 @@ export function renderGameLobby(id) {
     const playerDivDOM = document.createElement('img');
     playerDivDOM.id = `playerDivDOM_id_${name}`;
     playerDivDOM.className = 'playerDivDOM';
-    playerDivDOM.src = name;
+    playerDivDOM.src = playerImages[name];
     playerDivDOM.style.objectFit = 'cover';
     playerDivDOM.style.width = '64px';
     playerDivDOM.style.height = '64px';
     playersOnTableGrid.appendChild(playerDivDOM);
   });
-  console.log(findGameById(id));
 }
