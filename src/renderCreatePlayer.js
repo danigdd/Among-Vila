@@ -1,6 +1,7 @@
 import '../styles/general-styles.css';
 import '../styles/createPlayer-styles.css';
 import { renderMain } from './renderMain';
+import { renderGameLobby } from './renderGameLobby';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 import logo from '../resources/logofull.webp';
 import black from '../resources/PLAYERS/black.png';
@@ -154,4 +155,8 @@ export function renderCreatePlayer(idGame) {
   loadLobbyDOM.className = 'createButtons';
   loadLobbyDOM.textContent = 'Unirse';
   root.appendChild(loadLobbyDOM);
+
+  loadLobbyDOM.addEventListener('click', () => {
+    renderGameLobby(idGame);
+  });
 }
