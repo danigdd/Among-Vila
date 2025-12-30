@@ -61,7 +61,7 @@
   transition-duration: 0.2s;
 }
 
-.createButtons {
+.createButtons:hover {
   opacity: 0.8;
   cursor: pointer;
 }

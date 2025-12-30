@@ -1,0 +1,35 @@
+@import './colors.css';
+#textArea_id {
+  color: var(--text-primary);
+  height: 60px;
+  text-align: center;
+  resize: none;
+  overflow: hidden;
+  white-space: nowrap;
+  border: none;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  min-height: 0;
+  padding: 0px 20px 0px 20px;
+  font-size: 20px;
+  margin: 30px 30px 10px 30px;
+}
+
+#textArea_id:focus {
+  outline: none !important;
+}
+
+.playerToChoose_notChoosen {
+  opacity: 0.4;
+}
+
+.playerToChoose_notChoosen:hover {
+  transform: scale(1.1);
+  opacity: 1;
+  cursor: pointer;
+}
+
+.playerToChoose_Choosen {
+  transform: scale(1.2);
+  opacity: 1;
+}

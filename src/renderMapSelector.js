@@ -2,8 +2,8 @@ import '../styles/general-styles.css';
 import '../styles/mapSelector-styles.css';
 import { renderCreateGame } from './renderCreateGame';
 import { blocks } from '../utils/constants';
-import { renderGameLobby } from './renderGameLobby';
 import { findGameById } from './createGameController';
+import { renderCreatePlayer } from './renderCreatePlayer';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 
 import logo from '../resources/logofull.webp';
@@ -93,6 +93,6 @@ export function renderMapSelector(id) {
     });
 
     gameCreated['maps'] = selectedMaps;
-    renderGameLobby(id);
+    renderCreatePlayer(id);
   });
 }
