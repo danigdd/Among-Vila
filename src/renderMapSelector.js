@@ -80,7 +80,7 @@ export function renderMapSelector(id) {
   root.appendChild(createFinalGameDOM);
 
   createFinalGameDOM.addEventListener('click', () => {
-    let gameSettings = findGameById(id);
+    let gameCreated = findGameById(id);
     const selectedMaps = [];
 
     // get only selected maps
@@ -92,7 +92,7 @@ export function renderMapSelector(id) {
       }
     });
 
-    gameSettings['maps'] = selectedMaps;
+    gameCreated['maps'] = selectedMaps;
     renderGameLobby(id);
   });
 }
