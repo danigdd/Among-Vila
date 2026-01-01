@@ -3,6 +3,7 @@ import '../styles/createPlayer-styles.css';
 import { createPlayer } from './createPlayer';
 import { renderMain } from './renderMain';
 import { renderGameLobby } from './renderGameLobby';
+import { addPlayerToGame } from './createGameController';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 import logo from '../resources/logofull.webp';
 import black from '../resources/PLAYERS/black.png';
@@ -173,6 +174,8 @@ export function renderCreatePlayer(idGame) {
       selectedFinalColorValue
     );
 
-    renderGameLobby(idGame, playerObject);
+    addPlayerToGame(playerObject['id'], idGame);
+
+    renderGameLobby(idGame);
   });
 }

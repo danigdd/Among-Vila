@@ -1,4 +1,5 @@
 import { renderMain } from './renderMain';
+import { findGameById } from './createGameController';
 import '../styles/general-styles.css';
 import '../styles/renderGameLobbyPage-styles.css';
 import arrowLeft from '../resources/back-arrow-icon.svg';
@@ -128,5 +129,6 @@ export function renderGameLobby(id) {
   startGameDOM.textContent = 'Comenzar';
   root.appendChild(startGameDOM);
 
+  console.log(findGameById(id));
   if (currentPlayersOnGame.length > 4) startGameDOM.className = 'ready';
 }
