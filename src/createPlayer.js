@@ -11,7 +11,7 @@ export function createPlayer(name, color) {
   return player;
 }
 
-export function addPlayerToGlobalController(player) {
+function addPlayerToGlobalController(player) {
   globalPlayerController.push(player);
 }
 

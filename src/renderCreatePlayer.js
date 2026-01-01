@@ -1,5 +1,6 @@
 import '../styles/general-styles.css';
 import '../styles/createPlayer-styles.css';
+import { createPlayer } from './createPlayer';
 import { renderMain } from './renderMain';
 import { renderGameLobby } from './renderGameLobby';
 import arrowLeft from '../resources/back-arrow-icon.svg';
@@ -157,6 +158,16 @@ export function renderCreatePlayer(idGame) {
   root.appendChild(loadLobbyDOM);
 
   loadLobbyDOM.addEventListener('click', () => {
+    // get color
+    const selectedFinalColorDOM = document.getElementsByClassName(
+      'playerToChoose_Choosen'
+    )[0];
+    const selectedFinalColorValue =
+      selectedFinalColorDOM.id.split('playerToChoose_id_')[1];
+
+    // get username
+    const selectedUsername = playerNameInputDOM.value;
+    // const playerObject = createPlayer();
     renderGameLobby(idGame);
   });
 }
