@@ -167,7 +167,12 @@ export function renderCreatePlayer(idGame) {
 
     // get username
     const selectedUsername = playerNameInputDOM.value;
-    // const playerObject = createPlayer();
-    renderGameLobby(idGame);
+
+    const playerObject = createPlayer(
+      selectedUsername,
+      selectedFinalColorValue
+    );
+
+    renderGameLobby(idGame, playerObject);
   });
 }

@@ -24,3 +24,10 @@ export function removePlayerOfGlobalController(player_id) {
     globalPlayerController.splice(index, 1);
   }
 }
+
+export function findPlayerByID(player_id) {
+  const player = globalPlayerController.find(
+    (element) => element.id == player_id
+  );
+  return player;
+}
