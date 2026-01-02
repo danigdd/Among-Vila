@@ -102,7 +102,7 @@ export function renderGameLobby(id) {
     playerDivDOM.id = `playerDivDOM_id_${name}`;
     playerDivDOM.className = 'playerDivDOM';
     playerDivDOM.src = playerImages[name];
-    playerDivDOM.style.objectFit = 'cover';
+    playerDivDOM.style.objectFit = 'contain';
     playerDivDOM.style.width = '64px';
     playerDivDOM.style.height = '64px';
     playersOnTableGrid.appendChild(playerDivDOM);

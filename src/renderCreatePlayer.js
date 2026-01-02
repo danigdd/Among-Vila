@@ -116,7 +116,7 @@ export function renderCreatePlayer(idGame) {
   playerBlack.id = `playerToChoose_id_black`;
   playerBlack.className = 'playerToChoose_notChoosen';
   playerBlack.src = playerImages['black'];
-  playerBlack.style.objectFit = 'cover';
+  playerBlack.style.objectFit = 'contain';
   playerBlack.style.width = '50px';
   playerBlack.style.height = '50px';
   playerBlack.className = 'playerToChoose_Choosen';
@@ -135,7 +135,7 @@ export function renderCreatePlayer(idGame) {
     playerToChoose.id = `playerToChoose_id_${name}`;
     playerToChoose.className = 'playerToChoose_notChoosen';
     playerToChoose.src = playerImages[name];
-    playerToChoose.style.objectFit = 'cover';
+    playerToChoose.style.objectFit = 'contain';
     playerToChoose.style.width = '50px';
     playerToChoose.style.height = '50px';
     playersOnTableGrid.appendChild(playerToChoose);
