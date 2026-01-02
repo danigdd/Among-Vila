@@ -93,25 +93,11 @@ export function renderGameLobby(id) {
 
   root.appendChild(playersOnTableGrid);
 
-  // not current real players
-  let currentPlayersOnGame = [
-    'black',
-    'blue',
-    'brown',
-    'cyan',
-    'darkgreen',
-    'darkgrey',
-    'green',
-    'keylime',
-    'lightpurple',
-    'orange',
-    'pink',
-    'red',
-    'white',
-    'yellow',
-  ];
+  let currentPlayersOnGame = findGameById(id)['currentPlayers'];
+  console.log(currentPlayersOnGame);
 
-  currentPlayersOnGame.forEach((name) => {
+  currentPlayersOnGame.forEach((elem) => {
+    let name = elem['color'];
     const playerDivDOM = document.createElement('img');
     playerDivDOM.id = `playerDivDOM_id_${name}`;
     playerDivDOM.className = 'playerDivDOM';
