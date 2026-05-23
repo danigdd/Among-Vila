@@ -1,6 +1,7 @@
 import '../styles/general-styles.css';
 import '../styles/mainPage-styles.css';
 import { renderCreateGame } from './renderCreateGame';
+import { renderJoinGame } from './renderJoinGame';
 import logo from '../resources/logofull.webp';
 
 export function renderMain() {
@@ -50,6 +51,10 @@ export function renderMain() {
     joinGameDOM.id = 'joinGame_id';
     joinGameDOM.textContent = 'Unirse a partida';
     tableOptionsWrapperDOM.appendChild(joinGameDOM);
+
+    joinGameDOM.addEventListener('click', () => {
+      renderJoinGame();
+    });
 
     optionsAlreadyDisplayed = true;
   });
