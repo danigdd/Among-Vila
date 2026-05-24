@@ -58,6 +58,10 @@ export function validatePlayerCanJoin(game, player) {
     return { ok: false, error: 'La sala no existe' };
   }
 
+  if (game.phase && game.phase !== 'lobby') {
+    return { ok: false, error: 'La partida ya ha empezado' };
+  }
+
   const alreadyInGame = game.currentPlayers.some((p) => p.id == player.id);
 
   if (!alreadyInGame && isRoomFull(game)) {

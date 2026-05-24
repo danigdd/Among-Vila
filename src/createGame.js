@@ -18,6 +18,7 @@ export function createGameSettings(
     id: Math.floor(Math.random() * 900000) + 100000,
     currentPlayers: [],
     hostPlayerId: null,
+    phase: 'lobby',
   };
 
   return gameSettings;

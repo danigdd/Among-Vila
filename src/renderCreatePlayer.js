@@ -289,6 +289,16 @@ export async function renderCreatePlayer(idGame) {
     return;
   }
 
+  if (game.phase && game.phase !== 'lobby') {
+    const startedRoot = document.createElement('div');
+    startedRoot.id = 'content';
+    startedRoot.className = 'mainText';
+    startedRoot.textContent = 'La partida ya ha empezado';
+    loadingRoot.replaceWith(startedRoot);
+    setTimeout(() => renderMain(), 2500);
+    return;
+  }
+
   if (isRoomFull(game)) {
     const fullRoot = document.createElement('div');
     fullRoot.id = 'content';

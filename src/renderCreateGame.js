@@ -62,11 +62,12 @@ export function renderCreateGame() {
   const selectorLessPlayers = playerSelectorChildren[0];
   const selectorCountPlayers = playerSelectorChildren[1];
   const selectorMorePlayers = playerSelectorChildren[2];
+  selectorCountPlayers.textContent = 4;
 
   selectorMorePlayers.addEventListener('click', () => {
     let current = +selectorCountPlayers.textContent;
 
-    if (current === 14) current = 1;
+    if (current === 14) current = 4;
     else current += 1;
 
     selectorCountPlayers.textContent = current;
@@ -82,7 +83,7 @@ export function renderCreateGame() {
   selectorLessPlayers.addEventListener('click', () => {
     let current = +selectorCountPlayers.textContent;
 
-    if (current === 1) current = 14;
+    if (current === 4) current = 14;
     else current -= 1;
 
     selectorCountPlayers.textContent = current;

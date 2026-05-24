@@ -19,6 +19,12 @@ function playersArrayToMap(players) {
       name: player.name,
       color: player.color,
     };
+    if (player.role) {
+      entry.role = player.role;
+    }
+    if (player.roleRevealed) {
+      entry.roleRevealed = player.roleRevealed;
+    }
     if (player.disconnectedAt) {
       entry.disconnectedAt = player.disconnectedAt;
     }

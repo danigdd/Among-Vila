@@ -94,6 +94,11 @@ export function renderJoinGame(prefilledGameId = null) {
         return;
       }
 
+      if (game.phase && game.phase !== 'lobby') {
+        errorMessageDOM.textContent = 'La partida ya ha empezado';
+        return;
+      }
+
       if (isRoomFull(game)) {
         errorMessageDOM.textContent = `La sala está llena (${getMaxPlayers(game)} jugadores máximo)`;
         return;

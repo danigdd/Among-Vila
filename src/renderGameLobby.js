@@ -5,6 +5,7 @@ import {
   leaveGame,
   deleteGameByHost,
   kickPlayerFromGame,
+  startRoleReveal,
   syncGameInCache,
   purgeExpiredPlayers,
 } from './createGameController';
@@ -21,6 +22,8 @@ import {
   cancelDisconnectGrace,
 } from './gamesFirebase';
 import { clearRoomUrl, setRoomUrl } from './roomRouting';
+import { renderGameBoard } from './renderGameBoard';
+import { renderRoleReveal } from './renderRoleReveal';
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
 import '../styles/renderGameLobbyPage-styles.css';
@@ -171,6 +174,16 @@ export function renderGameLobby(id) {
     return;
   }
 
+  if (game.phase === 'roleReveal') {
+    renderRoleReveal(id);
+    return;
+  }
+
+  if (game.phase === 'inGame') {
+    renderGameBoard(id);
+    return;
+  }
+
   unsubscribeFromLobby();
 
   const oldRoot = document.getElementById('content');
@@ -256,6 +269,12 @@ export function renderGameLobby(id) {
   startGameDOM.textContent = 'Comenzar';
   root.appendChild(startGameDOM);
 
+  startGameDOM.addEventListener('click', async () => {
+    if (startGameDOM.disabled) return;
+    startGameDOM.disabled = true;
+    await startRoleReveal(id, currentPlayerId);
+  });
+
   setRoomUrl(id);
   registerDisconnectGrace(id, currentPlayerId);
 
@@ -293,6 +312,18 @@ export function renderGameLobby(id) {
       clearCurrentSession();
       clearRoomUrl();
       renderMain('Te han expulsado de la sala');
+      return;
+    }
+
+    if (cleanedGame.phase === 'roleReveal') {
+      unsubscribeFromLobby();
+      renderRoleReveal(id);
+      return;
+    }
+
+    if (cleanedGame.phase === 'inGame') {
+      unsubscribeFromLobby();
+      renderGameBoard(id);
       return;
     }
 

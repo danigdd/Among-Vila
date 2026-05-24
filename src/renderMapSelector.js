@@ -82,9 +82,18 @@ export function renderMapSelector(id) {
   createFinalGameDOM.textContent = 'Crear sala';
   root.appendChild(createFinalGameDOM);
 
+  const errorMessageDOM = document.createElement('div');
+  errorMessageDOM.id = 'mapSelectorError_id';
+  errorMessageDOM.className = 'secondaryText';
+  errorMessageDOM.style.marginTop = '10px';
+  errorMessageDOM.style.minHeight = '24px';
+  errorMessageDOM.style.color = '#e74c3c';
+  root.appendChild(errorMessageDOM);
+
   createFinalGameDOM.addEventListener('click', async () => {
     const gameCreated = findGameById(id);
     const selectedMaps = [];
+    errorMessageDOM.textContent = '';
 
     blocks.forEach((name, index) => {
       const blockDiv = document.getElementById(`blockSelector_${index}`);
@@ -93,6 +102,11 @@ export function renderMapSelector(id) {
         selectedMaps.push(text);
       }
     });
+
+    if (selectedMaps.length === 0) {
+      errorMessageDOM.textContent = 'Selecciona al menos un mapa';
+      return;
+    }
 
     gameCreated.maps = selectedMaps;
     createFinalGameDOM.disabled = true;

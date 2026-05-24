@@ -1,0 +1,35 @@
+@import './colors.css';
+
+.roleRevealScreen {
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+#roleRevealTitle_id {
+  margin-top: 120px;
+}
+
+.roleResultText {
+  font-size: 42px;
+  font-weight: 500;
+  margin-top: 70px;
+  min-height: 56px;
+  text-align: center;
+}
+
+.roleInnocent {
+  color: #4cdfff;
+}
+
+.roleImpostor {
+  color: #e74c3c;
+}
+
+#revealRoleButton_id {
+  margin-top: 50px;
+}
+
+#roleRevealProgress_id {
+  font-size: 22px;
+  margin-top: 28px;
+}

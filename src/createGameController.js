@@ -1,5 +1,9 @@
 import { findPlayerByID, removePlayerOfGlobalController } from './createPlayer';
-import { isDisconnectExpired, validatePlayerCanJoin } from './gameRules';
+import {
+  canStartGame,
+  isDisconnectExpired,
+  validatePlayerCanJoin,
+} from './gameRules';
 import {
   cancelDisconnectGrace,
   clearDisconnectGrace,
@@ -204,6 +208,81 @@ export async function kickPlayerFromGame(gameId, hostPlayerId, targetPlayerId) {
   }
 
   removePlayerOfGlobalController(targetPlayerId);
+  await persistGame(game);
+  return { success: true };
+}
+
+function shufflePlayers(players) {
+  const shuffled = [...players];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [
+      shuffled[randomIndex],
+      shuffled[index],
+    ];
+  }
+
+  return shuffled;
+}
+
+export async function startRoleReveal(gameId, hostPlayerId) {
+  const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
+
+  if (
+    !game ||
+    game.hostPlayerId != hostPlayerId ||
+    (game.phase && game.phase !== 'lobby')
+  ) {
+    return { success: false };
+  }
+
+  if (!canStartGame(game)) {
+    return { success: false };
+  }
+
+  const impostorCount = Math.min(
+    parseInt(game.numberImpostors, 10) || 1,
+    game.currentPlayers.length
+  );
+  const impostors = new Set(
+    shufflePlayers(game.currentPlayers)
+      .slice(0, impostorCount)
+      .map((player) => player.id)
+  );
+
+  game.currentPlayers = game.currentPlayers.map((player) => ({
+    ...player,
+    role: impostors.has(player.id) ? 'impostor' : 'innocent',
+    roleRevealed: false,
+  }));
+  game.phase = 'roleReveal';
+
+  await persistGame(game);
+  return { success: true };
+}
+
+export async function revealPlayerRole(gameId, playerId) {
+  const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
+
+  if (!game || game.phase !== 'roleReveal') {
+    return { success: false };
+  }
+
+  const player = game.currentPlayers.find((p) => p.id == playerId);
+  if (!player) {
+    return { success: false };
+  }
+
+  player.roleRevealed = true;
+
+  const allRolesRevealed = game.currentPlayers.every(
+    (currentPlayer) => currentPlayer.roleRevealed
+  );
+  if (allRolesRevealed) {
+    game.phase = 'inGame';
+  }
+
   await persistGame(game);
   return { success: true };
 }
