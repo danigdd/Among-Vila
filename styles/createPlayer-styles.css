@@ -33,3 +33,21 @@
   transform: scale(1.2);
   opacity: 1;
 }
+
+.playerToChoose_taken {
+  opacity: 0.2;
+  filter: grayscale(1);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.colorPickerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 360px;
+  margin: 40px auto 0;
+  padding: 10px;
+  justify-items: center;
+}

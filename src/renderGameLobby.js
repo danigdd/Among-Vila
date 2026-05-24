@@ -6,6 +6,11 @@ import {
   deleteGameByHost,
   syncGameInCache,
 } from './createGameController';
+import {
+  canStartGame,
+  getMaxPlayers,
+  MIN_PLAYERS_TO_START,
+} from './gameRules';
 import { getCurrentSession, clearCurrentSession } from './sessionContext';
 import { subscribeToGame } from './gamesFirebase';
 import '../styles/general-styles.css';
@@ -99,16 +104,31 @@ function paintPlayersGrid(playersOnTableGrid, game, currentPlayerId) {
 }
 
 function updateLobbyFromGame(game, currentPlayerId, ui) {
-  ui.hostBadgeDOM.textContent = isGameHost(game.id, currentPlayerId)
-    ? 'Eres el host de la sala'
-    : 'Estás en la sala';
+  const maxPlayers = getMaxPlayers(game);
+  const playerCount = game.currentPlayers.length;
+  const isHost = isGameHost(game.id, currentPlayerId);
+
+  ui.hostBadgeDOM.textContent = isHost
+    ? `Eres el host · ${playerCount}/${maxPlayers} jugadores`
+    : `En la sala · ${playerCount}/${maxPlayers} jugadores`;
 
   paintPlayersGrid(ui.playersOnTableGrid, game, currentPlayerId);
 
-  if (game.currentPlayers.length > 4) {
+  if (!isHost) {
+    ui.startGameDOM.style.display = 'none';
+    return;
+  }
+
+  ui.startGameDOM.style.display = 'block';
+
+  if (canStartGame(game)) {
     ui.startGameDOM.className = 'ready';
+    ui.startGameDOM.disabled = false;
+    ui.startGameDOM.textContent = 'Comenzar';
   } else {
     ui.startGameDOM.className = 'notReady';
+    ui.startGameDOM.disabled = true;
+    ui.startGameDOM.textContent = `Comenzar (${playerCount}/${MIN_PLAYERS_TO_START} mín.)`;
   }
 }
 
@@ -167,12 +187,7 @@ export function renderGameLobby(id) {
 
   const playersOnTableGrid = document.createElement('div');
   playersOnTableGrid.id = 'playersOnTableGrid';
-  playersOnTableGrid.style.display = 'grid';
-  playersOnTableGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-  playersOnTableGrid.style.gridTemplateRows = 'repeat(4, auto)';
-  playersOnTableGrid.style.gap = '25px';
-  playersOnTableGrid.style.padding = '10px';
-  playersOnTableGrid.style.marginTop = '40px';
+  playersOnTableGrid.className = 'lobbyPlayersGrid';
   root.appendChild(playersOnTableGrid);
 
   const lobbyActionsDOM = document.createElement('div');

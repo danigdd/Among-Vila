@@ -3,6 +3,7 @@ import '../styles/createGamePage-styles.css';
 import '../styles/createPlayer-styles.css';
 import { renderMain } from './renderMain';
 import { renderCreatePlayer } from './renderCreatePlayer';
+import { isRoomFull, getMaxPlayers } from './gameRules';
 import { joinGame } from './joinGameController';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 import logo from '../resources/logofull.webp';
@@ -77,6 +78,11 @@ export function renderJoinGame() {
       if (!game) {
         errorMessageDOM.textContent =
           'No se encontró ninguna sala con ese código';
+        return;
+      }
+
+      if (isRoomFull(game)) {
+        errorMessageDOM.textContent = `La sala está llena (${getMaxPlayers(game)} jugadores máximo)`;
         return;
       }
 

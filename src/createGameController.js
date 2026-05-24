@@ -1,4 +1,5 @@
 import { findPlayerByID, removePlayerOfGlobalController } from './createPlayer';
+import { validatePlayerCanJoin } from './gameRules';
 import {
   deleteGameFromFirebase,
   fetchGame,
@@ -49,7 +50,14 @@ export async function addPlayerToGame(playerID, gameID) {
   const currentGame = findGameById(gameID);
   const currentPlayer = findPlayerByID(playerID);
 
-  if (!currentGame || !currentPlayer) return;
+  if (!currentGame || !currentPlayer) {
+    return { success: false, error: 'No se pudo unir a la sala' };
+  }
+
+  const validation = validatePlayerCanJoin(currentGame, currentPlayer);
+  if (!validation.ok) {
+    return { success: false, error: validation.error };
+  }
 
   const alreadyInGame = currentGame.currentPlayers.some(
     (player) => player.id == playerID
@@ -63,6 +71,7 @@ export async function addPlayerToGame(playerID, gameID) {
   }
 
   await persistGame(currentGame);
+  return { success: true };
 }
 
 function pickRandomHost(game) {
