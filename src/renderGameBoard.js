@@ -12,10 +12,12 @@ import {
   subscribeToGame,
 } from './gamesFirebase';
 import { clearRoomUrl, setRoomUrl } from './roomRouting';
+import { createWorker, PSM } from 'tesseract.js';
 import '../styles/general-styles.css';
 import '../styles/gameBoard-styles.css';
 
 let gameBoardUnsubscribe = null;
+let ocrWorkerPromise = null;
 
 function unsubscribeFromGameBoard() {
   if (gameBoardUnsubscribe) {
@@ -56,6 +58,30 @@ function normalizeMissionText(text) {
     .toUpperCase();
 }
 
+function normalizeOcrText(text) {
+  return normalizeMissionText(text)
+    .replaceAll('O', '0')
+    .replaceAll('Q', '0')
+    .replaceAll('I', '1')
+    .replaceAll('L', '1')
+    .replaceAll('S', '5')
+    .replaceAll('Z', '2');
+}
+
+function getDoorCodes(text) {
+  return normalizeOcrText(text).match(/[A-HK][0-3][0-1][0-9]/g) || [];
+}
+
+function isMissionTextDetected(detectedText, missionCode) {
+  const missionNorm = normalizeMissionText(missionCode);
+
+  if (missionNorm === 'PISCINA' || missionNorm === 'FUTBOL') {
+    return normalizeMissionText(detectedText).includes(missionNorm);
+  }
+
+  return getDoorCodes(detectedText).includes(missionNorm);
+}
+
 function createCameraIcon() {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 20 20');
@@ -93,13 +119,93 @@ function getCameraErrorMessage(error) {
 }
 
 async function readTextFromImage(canvas) {
-  if (!('TextDetector' in window)) {
-    return null;
+  if (!ocrWorkerPromise) {
+    ocrWorkerPromise = createWorker('eng').then(async (worker) => {
+      await worker.setParameters({
+        tessedit_char_whitelist: 'ABCDEFGHK0123456789PISCNAFUTBOL',
+        tessedit_pageseg_mode: PSM.SINGLE_LINE,
+      });
+      return worker;
+    });
   }
 
-  const detector = new window.TextDetector();
-  const textBlocks = await detector.detect(canvas);
-  return textBlocks.map((block) => block.rawValue).join(' ');
+  const worker = await ocrWorkerPromise;
+  const { data } = await worker.recognize(canvas);
+  return data.text;
+}
+
+function createProcessedTextCanvas(sourceCanvas) {
+  const scale = 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = sourceCanvas.width * scale;
+  canvas.height = sourceCanvas.height * scale;
+
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(sourceCanvas, 0, 0, canvas.width, canvas.height);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const { data } = imageData;
+
+  for (let index = 0; index < data.length; index += 4) {
+    const gray = data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
+    const contrast = gray > 145 ? 255 : 0;
+    data[index] = contrast;
+    data[index + 1] = contrast;
+    data[index + 2] = contrast;
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return canvas;
+}
+
+function captureVideoFrame(video) {
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas
+    .getContext('2d')
+    .drawImage(video, 0, 0, canvas.width, canvas.height);
+  return canvas;
+}
+
+async function startCameraStream(ui) {
+  const constraints = {
+    audio: false,
+    video: { facingMode: { exact: ui.cameraFacingMode } },
+  };
+
+  try {
+    return await navigator.mediaDevices.getUserMedia(constraints);
+  } catch (error) {
+    if (error?.name !== 'OverconstrainedError') throw error;
+    return navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+  }
+}
+
+async function attachCameraStream(stream, ui) {
+  ui.cameraVideoDOM.srcObject = stream;
+  ui.cameraVideoDOM.muted = true;
+  await ui.cameraVideoDOM.play();
+}
+
+function closeCamera(ui) {
+  stopCameraStream(ui.cameraStream);
+  ui.cameraStream = null;
+  ui.cameraVideoDOM.srcObject = null;
+  ui.cameraModalDOM.style.display = 'none';
+  ui.cameraMessageDOM.textContent = '';
+}
+
+async function switchCamera(ui) {
+  ui.cameraFacingMode = ui.cameraFacingMode === 'environment' ? 'user' : 'environment';
+  stopCameraStream(ui.cameraStream);
+
+  try {
+    ui.cameraStream = await startCameraStream(ui);
+    await attachCameraStream(ui.cameraStream, ui);
+  } catch (error) {
+    ui.cameraMessageDOM.textContent = getCameraErrorMessage(error);
+  }
 }
 
 async function openMissionCamera(mission, index, gameId, playerId, ui) {
@@ -113,10 +219,7 @@ async function openMissionCamera(mission, index, gameId, playerId, ui) {
 
   let stream;
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: true,
-    });
+    stream = await startCameraStream(ui);
   } catch (error) {
     ui.cameraMessageDOM.textContent = getCameraErrorMessage(error);
     return;
@@ -124,13 +227,13 @@ async function openMissionCamera(mission, index, gameId, playerId, ui) {
 
   ui.cameraMessageDOM.textContent = '';
   ui.cameraModalDOM.style.display = 'flex';
-  ui.cameraVideoDOM.srcObject = stream;
-  ui.cameraVideoDOM.muted = true;
+  ui.cameraStream = stream;
 
   try {
-    await ui.cameraVideoDOM.play();
+    await attachCameraStream(stream, ui);
   } catch (error) {
     stopCameraStream(stream);
+    ui.cameraStream = null;
     ui.cameraVideoDOM.srcObject = null;
     ui.cameraModalDOM.style.display = 'none';
     ui.cameraMessageDOM.textContent = getCameraErrorMessage(error);
@@ -138,46 +241,43 @@ async function openMissionCamera(mission, index, gameId, playerId, ui) {
   }
 
   ui.closeCameraButtonDOM.onclick = () => {
-    stopCameraStream(stream);
-    ui.cameraVideoDOM.srcObject = null;
-    ui.cameraModalDOM.style.display = 'none';
-    ui.cameraMessageDOM.textContent = '';
+    closeCamera(ui);
+  };
+
+  ui.switchCameraButtonDOM.onclick = async () => {
+    await switchCamera(ui);
   };
 
   ui.captureCameraButtonDOM.onclick = async () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = ui.cameraVideoDOM.videoWidth;
-    canvas.height = ui.cameraVideoDOM.videoHeight;
-    canvas
-      .getContext('2d')
-      .drawImage(ui.cameraVideoDOM, 0, 0, canvas.width, canvas.height);
+    ui.captureCameraButtonDOM.disabled = true;
+    ui.captureCameraButtonDOM.textContent = 'Leyendo...';
+
+    const canvas = captureVideoFrame(ui.cameraVideoDOM);
+    const processedCanvas = createProcessedTextCanvas(canvas);
 
     let detectedText;
     try {
-      detectedText = await readTextFromImage(canvas);
+      detectedText = await readTextFromImage(processedCanvas);
     } catch {
       detectedText = '';
+    } finally {
+      ui.captureCameraButtonDOM.disabled = false;
+      ui.captureCameraButtonDOM.textContent = 'Hacer foto';
     }
 
     if (!detectedText) {
       ui.cameraMessageDOM.textContent =
-        'No puedo leer texto en esta cámara. Activa la cámara y enfoca bien la puerta.';
+        'No puedo leer texto en esta foto. Acércate más y centra el número.';
       return;
     }
 
-    const detectedNorm = normalizeMissionText(detectedText);
-    const missionNorm = normalizeMissionText(mission.code);
-
-    if (!detectedNorm.includes(missionNorm)) {
+    if (!isMissionTextDetected(detectedText, mission.code)) {
       ui.cameraMessageDOM.textContent = 'Misión errónea';
       return;
     }
 
     await completePlayerMission(gameId, playerId, index);
-    stopCameraStream(stream);
-    ui.cameraVideoDOM.srcObject = null;
-    ui.cameraModalDOM.style.display = 'none';
-    ui.cameraMessageDOM.textContent = '';
+    closeCamera(ui);
   };
 }
 
@@ -406,6 +506,12 @@ export function renderGameBoard(id) {
   captureCameraButtonDOM.textContent = 'Hacer foto';
   cameraActionsDOM.appendChild(captureCameraButtonDOM);
 
+  const switchCameraButtonDOM = document.createElement('button');
+  switchCameraButtonDOM.type = 'button';
+  switchCameraButtonDOM.className = 'roundActionButton switchCameraButton';
+  switchCameraButtonDOM.textContent = 'Girar';
+  cameraActionsDOM.appendChild(switchCameraButtonDOM);
+
   const closeCameraButtonDOM = document.createElement('button');
   closeCameraButtonDOM.type = 'button';
   closeCameraButtonDOM.className = 'roundActionButton sabotageButton';
@@ -419,6 +525,9 @@ export function renderGameBoard(id) {
     cameraVideoDOM,
     captureCameraButtonDOM,
     closeCameraButtonDOM,
+    switchCameraButtonDOM,
+    cameraFacingMode: 'environment',
+    cameraStream: null,
     globalMissionBarDOM,
     globalMissionCounterDOM,
     impostorActionsDOM,

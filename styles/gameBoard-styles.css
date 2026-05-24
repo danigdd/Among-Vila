@@ -251,6 +251,10 @@
   background-color: #5b3f9a;
 }
 
+.switchCameraButton {
+  background-color: #41415d;
+}
+
 #cameraMessage_id {
   background-color: rgba(139, 46, 46, 0.96);
   border: 1px solid #c65b5b;
