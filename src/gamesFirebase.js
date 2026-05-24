@@ -1,14 +1,28 @@
-import { get, onValue, ref, remove, set } from 'firebase/database';
+import {
+  get,
+  onDisconnect,
+  onValue,
+  ref,
+  remove,
+  set,
+  update,
+} from 'firebase/database';
 import { getFirebaseDatabase, isFirebaseReady } from './firebaseApp';
+
+let activeDisconnectCancel = null;
 
 function playersArrayToMap(players) {
   const map = {};
   (players || []).forEach((player) => {
-    map[player.id] = {
+    const entry = {
       id: player.id,
       name: player.name,
       color: player.color,
     };
+    if (player.disconnectedAt) {
+      entry.disconnectedAt = player.disconnectedAt;
+    }
+    map[player.id] = entry;
   });
   return map;
 }
@@ -38,6 +52,49 @@ function gameRef(gameId) {
   return ref(getFirebaseDatabase(), `games/${gameId}`);
 }
 
+function playerDisconnectRef(gameId, playerId) {
+  return ref(
+    getFirebaseDatabase(),
+    `games/${gameId}/currentPlayers/${playerId}/disconnectedAt`
+  );
+}
+
+export function cancelDisconnectGrace() {
+  if (activeDisconnectCancel) {
+    activeDisconnectCancel();
+    activeDisconnectCancel = null;
+  }
+}
+
+export function registerDisconnectGrace(gameId, playerId) {
+  if (!isFirebaseReady()) return;
+
+  cancelDisconnectGrace();
+
+  const disconnectRef = playerDisconnectRef(gameId, playerId);
+  activeDisconnectCancel = onDisconnect(disconnectRef);
+  activeDisconnectCancel.set(Date.now());
+}
+
+export async function clearDisconnectGrace(gameId, playerId) {
+  if (!isFirebaseReady()) return;
+
+  cancelDisconnectGrace();
+
+  await update(
+    ref(
+      getFirebaseDatabase(),
+      `games/${gameId}/currentPlayers/${playerId}`
+    ),
+    { disconnectedAt: null }
+  );
+}
+
+export async function markPlayerDisconnectedNow(gameId, playerId) {
+  if (!isFirebaseReady()) return;
+  await update(playerDisconnectRef(gameId, playerId), Date.now());
+}
+
 export async function saveGame(game) {
   if (!isFirebaseReady()) return;
   await set(gameRef(game.id), serializeGame(game));
@@ -52,6 +109,7 @@ export async function fetchGame(gameId) {
 
 export async function deleteGameFromFirebase(gameId) {
   if (!isFirebaseReady()) return;
+  cancelDisconnectGrace();
   await remove(gameRef(gameId));
 }
 

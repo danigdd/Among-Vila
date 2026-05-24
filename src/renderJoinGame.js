@@ -5,10 +5,13 @@ import { renderMain } from './renderMain';
 import { renderCreatePlayer } from './renderCreatePlayer';
 import { isRoomFull, getMaxPlayers } from './gameRules';
 import { joinGame } from './joinGameController';
+import { tryRestoreRoomSession } from './roomSession';
+import { getCurrentSession } from './sessionContext';
+import { clearRoomUrl } from './roomRouting';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 import logo from '../resources/logofull.webp';
 
-export function renderJoinGame() {
+export function renderJoinGame(prefilledGameId = null) {
   const oldRoot = document.getElementById('content');
 
   const root = document.createElement('div');
@@ -24,6 +27,7 @@ export function renderJoinGame() {
   root.appendChild(returnMainPageDOM);
 
   returnMainPageDOM.addEventListener('click', () => {
+    clearRoomUrl();
     renderMain();
   });
 
@@ -44,6 +48,9 @@ export function renderJoinGame() {
   gameCodeInputDOM.inputMode = 'numeric';
   gameCodeInputDOM.maxLength = 6;
   gameCodeInputDOM.placeholder = 'Ej: 123456';
+  if (prefilledGameId) {
+    gameCodeInputDOM.value = String(prefilledGameId);
+  }
   root.appendChild(gameCodeInputDOM);
 
   const errorMessageDOM = document.createElement('div');
@@ -73,6 +80,12 @@ export function renderJoinGame() {
     joinRoomButtonDOM.textContent = 'Buscando sala...';
 
     try {
+      const session = getCurrentSession();
+      if (session?.gameId == gameId) {
+        const restored = await tryRestoreRoomSession(gameId);
+        if (restored) return;
+      }
+
       const game = await joinGame(gameId);
 
       if (!game) {

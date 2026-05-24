@@ -1,4 +1,5 @@
 export const MIN_PLAYERS_TO_START = 4;
+export const DISCONNECT_GRACE_MS = 30_000;
 
 export function getMaxPlayers(game) {
   const max = parseInt(game?.numberPlayers, 10);
@@ -7,6 +8,28 @@ export function getMaxPlayers(game) {
 
 export function normalizePlayerName(name) {
   return (name || '').trim().toLowerCase();
+}
+
+export function isWithinGracePeriod(disconnectedAt) {
+  if (!disconnectedAt) return false;
+  return Date.now() - disconnectedAt < DISCONNECT_GRACE_MS;
+}
+
+export function isPlayerDisconnected(player) {
+  return Boolean(player?.disconnectedAt);
+}
+
+export function isPlayerInGrace(player) {
+  return isPlayerDisconnected(player) && isWithinGracePeriod(player.disconnectedAt);
+}
+
+export function isPlayerActiveInLobby(player) {
+  return !isPlayerDisconnected(player) || isPlayerInGrace(player);
+}
+
+export function isDisconnectExpired(disconnectedAt) {
+  if (!disconnectedAt) return false;
+  return Date.now() - disconnectedAt >= DISCONNECT_GRACE_MS;
 }
 
 export function isRoomFull(game) {
@@ -26,7 +49,8 @@ export function getTakenNames(game) {
 
 export function canStartGame(game) {
   if (!game) return false;
-  return game.currentPlayers.length >= MIN_PLAYERS_TO_START;
+  const activeCount = game.currentPlayers.filter(isPlayerActiveInLobby).length;
+  return activeCount >= MIN_PLAYERS_TO_START;
 }
 
 export function validatePlayerCanJoin(game, player) {

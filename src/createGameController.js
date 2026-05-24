@@ -1,8 +1,12 @@
 import { findPlayerByID, removePlayerOfGlobalController } from './createPlayer';
-import { validatePlayerCanJoin } from './gameRules';
+import { isDisconnectExpired, validatePlayerCanJoin } from './gameRules';
 import {
+  cancelDisconnectGrace,
+  clearDisconnectGrace,
   deleteGameFromFirebase,
   fetchGame,
+  markPlayerDisconnectedNow,
+  registerDisconnectGrace,
   saveGame,
 } from './gamesFirebase';
 
@@ -31,13 +35,82 @@ export async function addGameToGlobalController(game) {
   await persistGame(game);
 }
 
-export async function findGameByIdRemote(id) {
-  const cached = findGameById(id);
-  if (cached) return cached;
+export async function purgeExpiredPlayers(game) {
+  if (!game) return { game: null, gameDeleted: true };
 
-  const remoteGame = await fetchGame(id);
-  if (remoteGame) syncGameInCache(remoteGame);
-  return remoteGame || null;
+  const expired = [];
+  const remaining = [];
+
+  game.currentPlayers.forEach((player) => {
+    if (isDisconnectExpired(player.disconnectedAt)) {
+      expired.push(player);
+    } else {
+      remaining.push(player);
+    }
+  });
+
+  if (expired.length === 0) {
+    return { game, gameDeleted: false };
+  }
+
+  const hostExpired = expired.some((p) => p.id == game.hostPlayerId);
+  expired.forEach((p) => removePlayerOfGlobalController(p.id));
+  game.currentPlayers = remaining;
+
+  if (game.currentPlayers.length === 0) {
+    await deleteGame(game.id);
+    return { game: null, gameDeleted: true };
+  }
+
+  if (hostExpired) {
+    game.hostPlayerId = pickRandomHost(game);
+  }
+
+  await persistGame(game);
+  return { game, gameDeleted: false };
+}
+
+export async function loadGameWithCleanup(gameId) {
+  const remoteGame = await fetchGame(gameId);
+  if (!remoteGame) return null;
+
+  syncGameInCache(remoteGame);
+  const { game } = await purgeExpiredPlayers(findGameById(gameId));
+  return game;
+}
+
+export async function findGameByIdRemote(id) {
+  return loadGameWithCleanup(id);
+}
+
+export async function reconnectPlayer(gameId, playerId) {
+  const game = await loadGameWithCleanup(gameId);
+  if (!game) return { ok: false, reason: 'missing' };
+
+  const player = game.currentPlayers.find((p) => p.id == playerId);
+  if (!player) return { ok: false, reason: 'not_in_room' };
+
+  if (isDisconnectExpired(player.disconnectedAt)) {
+    return { ok: false, reason: 'expired' };
+  }
+
+  delete player.disconnectedAt;
+  await clearDisconnectGrace(gameId, playerId);
+  await persistGame(game);
+  registerDisconnectGrace(gameId, playerId);
+  return { ok: true };
+}
+
+export async function softDisconnectPlayer(gameId, playerId) {
+  const game = findGameById(gameId);
+  if (!game) return;
+
+  const player = game.currentPlayers.find((p) => p.id == playerId);
+  if (!player) return;
+
+  player.disconnectedAt = Date.now();
+  syncGameInCache(game);
+  await markPlayerDisconnectedNow(gameId, playerId);
 }
 
 export function isGameHost(gameId, playerId) {
@@ -64,6 +137,13 @@ export async function addPlayerToGame(playerID, gameID) {
   );
   if (!alreadyInGame) {
     currentGame.currentPlayers.push(currentPlayer);
+  } else {
+    const existing = currentGame.currentPlayers.find(
+      (player) => player.id == playerID
+    );
+    if (existing?.disconnectedAt) {
+      delete existing.disconnectedAt;
+    }
   }
 
   if (currentGame.hostPlayerId == null) {
@@ -71,6 +151,7 @@ export async function addPlayerToGame(playerID, gameID) {
   }
 
   await persistGame(currentGame);
+  registerDisconnectGrace(gameID, playerID);
   return { success: true };
 }
 
@@ -81,6 +162,8 @@ function pickRandomHost(game) {
 }
 
 export async function deleteGame(gameId) {
+  cancelDisconnectGrace();
+
   const index = gamesGlobalController.findIndex((game) => game.id == gameId);
   if (index === -1) return false;
 
@@ -101,6 +184,8 @@ export async function deleteGameByHost(gameId, playerId) {
 }
 
 export async function leaveGame(gameId, playerId) {
+  cancelDisconnectGrace();
+
   const game = findGameById(gameId);
   if (!game) {
     return { gameDeleted: true, hostTransferred: false };

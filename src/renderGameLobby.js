@@ -5,14 +5,21 @@ import {
   leaveGame,
   deleteGameByHost,
   syncGameInCache,
+  purgeExpiredPlayers,
 } from './createGameController';
 import {
   canStartGame,
   getMaxPlayers,
   MIN_PLAYERS_TO_START,
+  isPlayerInGrace,
 } from './gameRules';
 import { getCurrentSession, clearCurrentSession } from './sessionContext';
-import { subscribeToGame } from './gamesFirebase';
+import {
+  subscribeToGame,
+  registerDisconnectGrace,
+  cancelDisconnectGrace,
+} from './gamesFirebase';
+import { clearRoomUrl, setRoomUrl } from './roomRouting';
 import '../styles/general-styles.css';
 import '../styles/createGamePage-styles.css';
 import '../styles/renderGameLobbyPage-styles.css';
@@ -63,10 +70,12 @@ export function unsubscribeFromLobby() {
 
 async function exitLobby(gameId, playerId) {
   unsubscribeFromLobby();
+  cancelDisconnectGrace();
   if (gameId && playerId) {
     await leaveGame(gameId, playerId);
   }
   clearCurrentSession();
+  clearRoomUrl();
   renderMain();
 }
 
@@ -96,6 +105,10 @@ function paintPlayersGrid(playersOnTableGrid, game, currentPlayerId) {
     }
     if (player.id == game.hostPlayerId) {
       playerNameDOM.textContent += ' ★';
+    }
+    if (isPlayerInGrace(player)) {
+      playerNameDOM.textContent += ' (ausente)';
+      playerWrapperDOM.style.opacity = '0.45';
     }
     playerWrapperDOM.appendChild(playerNameDOM);
 
@@ -214,8 +227,10 @@ export function renderGameLobby(id) {
 
     deleteRoomButtonDOM.addEventListener('click', async () => {
       unsubscribeFromLobby();
+      cancelDisconnectGrace();
       await deleteGameByHost(id, currentPlayerId);
       clearCurrentSession();
+      clearRoomUrl();
       renderMain();
     });
   }
@@ -226,18 +241,45 @@ export function renderGameLobby(id) {
   startGameDOM.textContent = 'Comenzar';
   root.appendChild(startGameDOM);
 
+  setRoomUrl(id);
+  registerDisconnectGrace(id, currentPlayerId);
+
   const ui = { hostBadgeDOM, playersOnTableGrid, startGameDOM };
   updateLobbyFromGame(game, currentPlayerId, ui);
 
-  lobbyUnsubscribe = subscribeToGame(id, (remoteGame) => {
+  lobbyUnsubscribe = subscribeToGame(id, async (remoteGame) => {
     if (!remoteGame) {
       unsubscribeFromLobby();
       clearCurrentSession();
+      clearRoomUrl();
       renderMain();
       return;
     }
 
     syncGameInCache(remoteGame);
-    updateLobbyFromGame(remoteGame, currentPlayerId, ui);
+    const { game: cleanedGame, gameDeleted } = await purgeExpiredPlayers(
+      findGameById(id)
+    );
+
+    if (gameDeleted || !cleanedGame) {
+      unsubscribeFromLobby();
+      clearCurrentSession();
+      clearRoomUrl();
+      renderMain();
+      return;
+    }
+
+    const stillInRoom = cleanedGame.currentPlayers.some(
+      (p) => p.id == currentPlayerId
+    );
+    if (!stillInRoom) {
+      unsubscribeFromLobby();
+      clearCurrentSession();
+      clearRoomUrl();
+      renderMain();
+      return;
+    }
+
+    updateLobbyFromGame(cleanedGame, currentPlayerId, ui);
   });
 }
