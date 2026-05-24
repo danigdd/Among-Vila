@@ -292,10 +292,7 @@ export async function startRoleReveal(gameId, hostPlayerId) {
     return { success: false };
   }
 
-  const impostorCount = Math.min(
-    parseInt(game.numberImpostors, 10) || 1,
-    game.currentPlayers.length
-  );
+  const impostorCount = 0; // DEBUG: sin impostores para testing
   const impostors = new Set(
     shufflePlayers(game.currentPlayers)
       .slice(0, impostorCount)
@@ -304,7 +301,7 @@ export async function startRoleReveal(gameId, hostPlayerId) {
 
   game.currentPlayers = game.currentPlayers.map((player) => ({
     ...player,
-    role: impostors.has(player.id) ? 'impostor' : 'innocent',
+    role: 'innocent', // DEBUG: todos inocentes, sin impostores temporalmente
     roleRevealed: false,
     missions: createPlayerMissions(game.maps),
     emergencyUses: 0,
