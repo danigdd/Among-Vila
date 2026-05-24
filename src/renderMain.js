@@ -4,7 +4,7 @@ import { renderCreateGame } from './renderCreateGame';
 import { renderJoinGame } from './renderJoinGame';
 import logo from '../resources/logofull.webp';
 
-export function renderMain() {
+export function renderMain(noticeText = '') {
   const oldRoot = document.getElementById('content');
   const root = document.createElement('div');
   root.id = 'content';
@@ -21,6 +21,13 @@ export function renderMain() {
   titleGameDescriptionDOM.id = 'titleGameDescription_id';
   titleGameDescriptionDOM.textContent = 'Empieza a jugar por la Vila';
   root.appendChild(titleGameDescriptionDOM);
+
+  if (noticeText) {
+    const noticeDOM = document.createElement('div');
+    noticeDOM.id = 'mainNotice_id';
+    noticeDOM.textContent = noticeText;
+    root.appendChild(noticeDOM);
+  }
 
   // PLAY BUTTON
   const playButtonDOM = document.createElement('button');

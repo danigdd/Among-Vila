@@ -24,6 +24,22 @@
   max-width: 300px;
 }
 
+#mainNotice_id {
+  color: var(--text-secondary);
+  background-color: #8b2e2e;
+  border: 1px solid #c65b5b;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.35;
+  margin-top: 24px;
+  max-width: 350px;
+  padding: 14px 18px;
+  text-align: center;
+  width: 100%;
+}
+
 #playButton_id {
   margin-top: 80px;
   max-width: 350px;

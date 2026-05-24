@@ -183,6 +183,31 @@ export async function deleteGameByHost(gameId, playerId) {
   return deleteGame(gameId);
 }
 
+export async function kickPlayerFromGame(gameId, hostPlayerId, targetPlayerId) {
+  const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
+
+  if (!game || game.hostPlayerId != hostPlayerId) {
+    return { success: false };
+  }
+
+  if (targetPlayerId == hostPlayerId) {
+    return { success: false };
+  }
+
+  const originalLength = game.currentPlayers.length;
+  game.currentPlayers = game.currentPlayers.filter(
+    (player) => player.id != targetPlayerId
+  );
+
+  if (game.currentPlayers.length === originalLength) {
+    return { success: false };
+  }
+
+  removePlayerOfGlobalController(targetPlayerId);
+  await persistGame(game);
+  return { success: true };
+}
+
 export async function leaveGame(gameId, playerId) {
   cancelDisconnectGrace();
 

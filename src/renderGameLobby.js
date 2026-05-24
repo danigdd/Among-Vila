@@ -4,6 +4,7 @@ import {
   isGameHost,
   leaveGame,
   deleteGameByHost,
+  kickPlayerFromGame,
   syncGameInCache,
   purgeExpiredPlayers,
 } from './createGameController';
@@ -79,7 +80,7 @@ async function exitLobby(gameId, playerId) {
   renderMain();
 }
 
-function paintPlayersGrid(playersOnTableGrid, game, currentPlayerId) {
+function paintPlayersGrid(playersOnTableGrid, game, currentPlayerId, isHost) {
   playersOnTableGrid.replaceChildren();
 
   game.currentPlayers.forEach((player) => {
@@ -87,6 +88,20 @@ function paintPlayersGrid(playersOnTableGrid, game, currentPlayerId) {
     const playerWrapperDOM = document.createElement('div');
     playerWrapperDOM.className = 'lobbyPlayerWrapper';
     playerWrapperDOM.id = `playerWrapper_id_${player.id}`;
+
+    if (isHost && player.id != currentPlayerId) {
+      const kickPlayerButtonDOM = document.createElement('button');
+      kickPlayerButtonDOM.type = 'button';
+      kickPlayerButtonDOM.className = 'kickPlayerButton';
+      kickPlayerButtonDOM.textContent = 'x';
+      kickPlayerButtonDOM.title = 'Expulsar jugador';
+      kickPlayerButtonDOM.setAttribute('aria-label', 'Expulsar jugador');
+      kickPlayerButtonDOM.addEventListener('click', async () => {
+        kickPlayerButtonDOM.disabled = true;
+        await kickPlayerFromGame(game.id, currentPlayerId, player.id);
+      });
+      playerWrapperDOM.appendChild(kickPlayerButtonDOM);
+    }
 
     const playerDivDOM = document.createElement('img');
     playerDivDOM.id = `playerDivDOM_id_${color}_${player.id}`;
@@ -125,7 +140,7 @@ function updateLobbyFromGame(game, currentPlayerId, ui) {
     ? `Eres el host · ${playerCount}/${maxPlayers} jugadores`
     : `En la sala · ${playerCount}/${maxPlayers} jugadores`;
 
-  paintPlayersGrid(ui.playersOnTableGrid, game, currentPlayerId);
+  paintPlayersGrid(ui.playersOnTableGrid, game, currentPlayerId, isHost);
 
   if (!isHost) {
     ui.startGameDOM.style.display = 'none';
@@ -274,9 +289,10 @@ export function renderGameLobby(id) {
     );
     if (!stillInRoom) {
       unsubscribeFromLobby();
+      cancelDisconnectGrace();
       clearCurrentSession();
       clearRoomUrl();
-      renderMain();
+      renderMain('Te han expulsado de la sala');
       return;
     }
 
