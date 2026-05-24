@@ -31,3 +31,37 @@
 #startGameButton_id.notReady:hover {
   cursor: pointer;
 }
+
+#lobbyActions_id {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.lobbyActionButton {
+  margin-top: 0;
+  width: 100%;
+}
+
+.lobbyDangerButton {
+  background-color: #8b2e2e;
+}
+
+.lobbyPlayerWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.lobbyPlayerName {
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+  max-width: 80px;
+  background-color: transparent;
+}

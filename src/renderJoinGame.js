@@ -59,7 +59,7 @@ export function renderJoinGame() {
   joinRoomButtonDOM.textContent = 'Unirse';
   root.appendChild(joinRoomButtonDOM);
 
-  joinRoomButtonDOM.addEventListener('click', () => {
+  joinRoomButtonDOM.addEventListener('click', async () => {
     const gameId = gameCodeInputDOM.value.trim();
     errorMessageDOM.textContent = '';
 
@@ -68,13 +68,22 @@ export function renderJoinGame() {
       return;
     }
 
-    const game = joinGame(gameId);
+    joinRoomButtonDOM.disabled = true;
+    joinRoomButtonDOM.textContent = 'Buscando sala...';
 
-    if (!game) {
-      errorMessageDOM.textContent = 'No se encontró ninguna sala con ese código';
-      return;
+    try {
+      const game = await joinGame(gameId);
+
+      if (!game) {
+        errorMessageDOM.textContent =
+          'No se encontró ninguna sala con ese código';
+        return;
+      }
+
+      renderCreatePlayer(gameId);
+    } finally {
+      joinRoomButtonDOM.disabled = false;
+      joinRoomButtonDOM.textContent = 'Unirse';
     }
-
-    renderCreatePlayer(gameId);
   });
 }

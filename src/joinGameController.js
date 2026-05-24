@@ -1,5 +1,5 @@
-import { findGameById } from './createGameController';
-export function joinGame(gameID) {
-  const game = findGameById(gameID);
-  return game;
+import { findGameByIdRemote } from './createGameController';
+
+export async function joinGame(gameID) {
+  return findGameByIdRemote(gameID);
 }

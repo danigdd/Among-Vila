@@ -278,7 +278,7 @@ export function renderCreateGame() {
   selectMapButtonDOM.className = 'createButtons';
   selectMapButtonDOM.textContent = 'Selección de mapa';
   root.appendChild(selectMapButtonDOM);
-  selectMapButtonDOM.addEventListener('click', () => {
+  selectMapButtonDOM.addEventListener('click', async () => {
     const gameSettings = createGameSettings(
       selectorCountPlayers.textContent,
       selectorCountImpostors.textContent,
@@ -289,9 +289,13 @@ export function renderCreateGame() {
       selectorCountdiscussTime.textContent
     );
 
-    addGameToGlobalController(gameSettings);
-
-    renderMapSelector(gameSettings.id);
+    selectMapButtonDOM.disabled = true;
+    try {
+      await addGameToGlobalController(gameSettings);
+      renderMapSelector(gameSettings.id);
+    } finally {
+      selectMapButtonDOM.disabled = false;
+    }
   });
 }
 

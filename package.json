@@ -9,7 +9,7 @@
     "lint": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{js,css,html}\"",
     "deploy": "gh-pages -d dist",
-    "deploy:firebase": "npm run build && firebase deploy --only hosting"
+    "deploy:firebase": "npm run build && firebase deploy --only hosting,database"
   },
   "keywords": [],
   "author": "",
@@ -30,5 +30,8 @@
     "webpack": "^5.104.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.2"
+  },
+  "dependencies": {
+    "firebase": "^12.13.0"
   }
 }

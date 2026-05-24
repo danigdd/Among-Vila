@@ -4,6 +4,7 @@ import { createPlayer } from './createPlayer';
 import { renderMain } from './renderMain';
 import { renderGameLobby } from './renderGameLobby';
 import { addPlayerToGame } from './createGameController';
+import { setCurrentSession } from './sessionContext';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 import logo from '../resources/logofull.webp';
 import black from '../resources/PLAYERS/black.png';
@@ -158,7 +159,7 @@ export function renderCreatePlayer(idGame) {
   loadLobbyDOM.textContent = 'Unirse';
   root.appendChild(loadLobbyDOM);
 
-  loadLobbyDOM.addEventListener('click', () => {
+  loadLobbyDOM.addEventListener('click', async () => {
     // get color
     const selectedFinalColorDOM = document.getElementsByClassName(
       'playerToChoose_Choosen'
@@ -174,8 +175,16 @@ export function renderCreatePlayer(idGame) {
       selectedFinalColorValue
     );
 
-    addPlayerToGame(playerObject['id'], idGame);
+    loadLobbyDOM.disabled = true;
+    loadLobbyDOM.textContent = 'Entrando...';
 
-    renderGameLobby(idGame);
+    try {
+      await addPlayerToGame(playerObject.id, idGame);
+      setCurrentSession(idGame, playerObject.id);
+      renderGameLobby(idGame);
+    } finally {
+      loadLobbyDOM.disabled = false;
+      loadLobbyDOM.textContent = 'Unirse';
+    }
   });
 }
