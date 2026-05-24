@@ -66,19 +66,57 @@ function isMissionTextDetected(detectedCode, missionCode) {
   return detectedNorm.includes(missionNorm);
 }
 
+// Preprocesar imagen para mejorar OCR: aumentar contraste y brillo
+function preprocessImageForOCR(canvas) {
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  const contrast = 1.5;
+  const brightness = 20;
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = Math.min(255, Math.max(0, data[i] * contrast + brightness));
+    data[i + 1] = Math.min(
+      255,
+      Math.max(0, data[i + 1] * contrast + brightness)
+    );
+    data[i + 2] = Math.min(
+      255,
+      Math.max(0, data[i + 2] * contrast + brightness)
+    );
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return canvas;
+}
+
 async function readCodeFromImage(canvas) {
   try {
-    const imageUrl = canvas.toDataURL('image/jpeg', 0.92);
+    console.log('Canvas original:', canvas.width, 'x', canvas.height);
+
+    // Crear canvas aumentado 2x para mejor OCR
+    const scaledCanvas = document.createElement('canvas');
+    scaledCanvas.width = canvas.width * 2;
+    scaledCanvas.height = canvas.height * 2;
+    const scaledCtx = scaledCanvas.getContext('2d');
+    scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+
+    preprocessImageForOCR(scaledCanvas);
+
+    const imageUrl = scaledCanvas.toDataURL('image/jpeg', 0.95);
     console.log('Iniciando OCR con Tesseract.js...');
 
     const result = await Tesseract.recognize(imageUrl, 'eng', {
       logger: (m) => console.log('Tesseract progress:', m),
+      tessedit_char_whitelist: 'ABCDEFGHK0123456789PISCIFUTBL',
     });
 
     let extractedText = result.data.text.trim();
+    let confidence = result.data.confidence;
     console.log('Tesseract texto extraído:', extractedText);
+    console.log('Confianza OCR:', confidence);
 
-    // Limpiar el texto: solo mantener caracteres alfanuméricos
     extractedText = extractedText.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
     console.log('Texto limpio:', extractedText);
@@ -94,7 +132,8 @@ function captureVideoFrame(video) {
   const canvas = document.createElement('canvas');
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   return canvas;
 }
 
