@@ -226,6 +226,26 @@ function shufflePlayers(players) {
   return shuffled;
 }
 
+const MISSION_BLOCKS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K'];
+const MISSION_FLOORS = [0, 1, 2, 3];
+const MISSIONS_PER_PLAYER = 5;
+
+function createMissionCode() {
+  const block =
+    MISSION_BLOCKS[Math.floor(Math.random() * MISSION_BLOCKS.length)];
+  const floor =
+    MISSION_FLOORS[Math.floor(Math.random() * MISSION_FLOORS.length)];
+  const door = Math.floor(Math.random() * 12) + 1;
+  return `${block}${floor}${String(door).padStart(2, '0')}`;
+}
+
+function createPlayerMissions() {
+  return Array.from({ length: MISSIONS_PER_PLAYER }, () => ({
+    code: createMissionCode(),
+    completed: false,
+  }));
+}
+
 export async function startRoleReveal(gameId, hostPlayerId) {
   const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
 
@@ -255,9 +275,40 @@ export async function startRoleReveal(gameId, hostPlayerId) {
     ...player,
     role: impostors.has(player.id) ? 'impostor' : 'innocent',
     roleRevealed: false,
+    missions: createPlayerMissions(),
+    emergencyUses: 0,
   }));
+  const innocentCount = game.currentPlayers.filter(
+    (player) => player.role === 'innocent'
+  ).length;
+  game.missionTarget = Math.max(
+    innocentCount,
+    innocentCount * MISSIONS_PER_PLAYER - Math.ceil(innocentCount / 2)
+  );
   game.phase = 'roleReveal';
 
+  await persistGame(game);
+  return { success: true };
+}
+
+export async function togglePlayerMission(gameId, playerId, missionIndex) {
+  const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
+
+  if (!game || game.phase !== 'inGame') {
+    return { success: false };
+  }
+
+  const player = game.currentPlayers.find((p) => p.id == playerId);
+  if (!player || player.role !== 'innocent') {
+    return { success: false };
+  }
+
+  const mission = player.missions?.[missionIndex];
+  if (!mission) {
+    return { success: false };
+  }
+
+  mission.completed = !mission.completed;
   await persistGame(game);
   return { success: true };
 }

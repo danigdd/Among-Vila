@@ -6,15 +6,20 @@
 }
 
 #roleRevealTitle_id {
-  margin-top: 120px;
+  margin-top: 140px;
 }
 
 .roleResultText {
   font-size: 42px;
   font-weight: 500;
-  margin-top: 70px;
+  margin-top: 64px;
   min-height: 56px;
   text-align: center;
+}
+
+.roleHidden {
+  margin-top: 8px;
+  min-height: 0;
 }
 
 .roleInnocent {
@@ -26,7 +31,7 @@
 }
 
 #revealRoleButton_id {
-  margin-top: 50px;
+  margin-top: 12px;
 }
 
 #roleRevealProgress_id {

@@ -25,6 +25,12 @@ function playersArrayToMap(players) {
     if (player.roleRevealed) {
       entry.roleRevealed = player.roleRevealed;
     }
+    if (player.missions) {
+      entry.missions = player.missions;
+    }
+    if (player.emergencyUses) {
+      entry.emergencyUses = player.emergencyUses;
+    }
     if (player.disconnectedAt) {
       entry.disconnectedAt = player.disconnectedAt;
     }

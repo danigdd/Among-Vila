@@ -3,4 +3,236 @@
 .gameBoardScreen {
   min-height: 100vh;
   box-sizing: border-box;
+  gap: 0;
+  padding-bottom: 32px;
+}
+
+#gameBoardTitle_id {
+  font-size: 34px;
+  margin-top: 24px;
+}
+
+#missionPanel_id {
+  box-sizing: border-box;
+  margin-top: 28px;
+  max-width: 420px;
+  width: 100%;
+}
+
+#missionHeader_id {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.missionPanelTitle,
+#personalMissionProgress_id,
+#globalProgressTop_id,
+#emergencyCounter_id {
+  background-color: transparent;
+}
+
+.missionPanelTitle {
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 500;
+}
+
+#personalMissionProgress_id {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+#missionList_id {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.missionRow {
+  align-items: center;
+  background-color: var(--bg-secondary);
+  border: 1px solid rgba(160, 160, 176, 0.25);
+  border-radius: 8px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 8px 10px 8px 16px;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.missionRow:hover {
+  border-color: rgba(224, 224, 224, 0.45);
+  transform: translateY(-1px);
+}
+
+.missionCodeButton {
+  background-color: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 22px;
+  font-weight: 400;
+  padding: 0;
+  transition:
+    color 0.2s,
+    font-weight 0.2s;
+}
+
+.missionCompleted .missionCodeButton {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.missionCameraButton {
+  align-items: center;
+  background-color: #313145;
+  border: 1px solid rgba(160, 160, 176, 0.35);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  height: 38px;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+  width: 42px;
+}
+
+.missionCameraButton:hover {
+  background-color: #41415d;
+  transform: translateY(-1px);
+}
+
+.missionCameraButton svg {
+  background-color: transparent;
+  fill: currentColor;
+  height: 21px;
+  width: 21px;
+}
+
+#globalMissionProgress_id {
+  background-color: transparent;
+  margin-top: 28px;
+  max-width: 420px;
+  width: 100%;
+}
+
+#globalProgressTop_id {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  font-size: 16px;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+#globalMissionTrack_id {
+  background-color: #10101b;
+  border: 1px solid rgba(160, 160, 176, 0.25);
+  border-radius: 999px;
+  box-sizing: border-box;
+  height: 18px;
+  overflow: hidden;
+  width: 100%;
+}
+
+#globalMissionBar_id {
+  background-color: #4cdfff;
+  border-radius: 999px;
+  height: 100%;
+  transition: width 0.3s ease;
+  width: 0;
+}
+
+#actionZone_id {
+  align-items: center;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 44px;
+}
+
+#emergencyButton_id {
+  align-items: center;
+  background:
+    radial-gradient(circle at 35% 28%, #ff7777 0 18%, transparent 19%),
+    #c92f2f;
+  border: 3px solid #ff9a9a;
+  border-radius: 50%;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.35),
+    inset 0 -8px 0 rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  font-size: 56px;
+  font-weight: 800;
+  height: 112px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0 0 6px;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+  width: 112px;
+}
+
+#emergencyButton_id:hover {
+  box-shadow:
+    0 14px 26px rgba(0, 0, 0, 0.42),
+    inset 0 -8px 0 rgba(0, 0, 0, 0.18);
+  transform: translateY(-3px);
+}
+
+#emergencyCounter_id {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.playerActionButtons {
+  background-color: transparent;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.roundActionButton {
+  border: none;
+  border-radius: 999px;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 112px;
+  padding: 13px 18px;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.roundActionButton:hover {
+  opacity: 0.86;
+  transform: translateY(-2px);
+}
+
+.reportButton {
+  background-color: #2f6f8f;
+}
+
+.killButton {
+  background-color: #8b2e2e;
+}
+
+.sabotageButton {
+  background-color: #5b3f9a;
 }

@@ -40,7 +40,7 @@ function updateRoleRevealScreen(game, playerId, ui) {
 
   if (!player?.roleRevealed) {
     ui.roleDOM.textContent = '';
-    ui.roleDOM.className = 'roleResultText';
+    ui.roleDOM.className = 'roleResultText roleHidden';
     ui.revealButtonDOM.style.display = 'block';
     ui.revealButtonDOM.disabled = false;
     return;
