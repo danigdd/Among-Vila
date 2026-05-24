@@ -4,11 +4,14 @@ import { renderCreateGame } from './renderCreateGame';
 import { blocks } from '../utils/constants';
 import { findGameById, persistGame } from './createGameController';
 import { renderCreatePlayer } from './renderCreatePlayer';
+import { setRoomUrl } from './roomRouting';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 
 import logo from '../resources/logofull.webp';
 
 export function renderMapSelector(id) {
+  setRoomUrl(id);
+
   const oldRoot = document.getElementById('content');
 
   const root = document.createElement('div');

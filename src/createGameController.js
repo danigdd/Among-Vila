@@ -178,7 +178,7 @@ export async function deleteGame(gameId) {
 }
 
 export async function deleteGameByHost(gameId, playerId) {
-  const game = findGameById(gameId);
+  const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
   if (!game || game.hostPlayerId != playerId) return false;
   return deleteGame(gameId);
 }
@@ -186,7 +186,7 @@ export async function deleteGameByHost(gameId, playerId) {
 export async function leaveGame(gameId, playerId) {
   cancelDisconnectGrace();
 
-  const game = findGameById(gameId);
+  const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
   if (!game) {
     return { gameDeleted: true, hostTransferred: false };
   }

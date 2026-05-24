@@ -12,6 +12,7 @@ import {
   normalizePlayerName,
 } from './gameRules';
 import { setCurrentSession } from './sessionContext';
+import { clearRoomUrl, setRoomUrl } from './roomRouting';
 import arrowLeft from '../resources/back-arrow-icon.svg';
 import logo from '../resources/logofull.webp';
 import black from '../resources/PLAYERS/black.png';
@@ -121,6 +122,7 @@ function buildCreatePlayerScreen(game, idGame) {
   root.appendChild(returnMainPageDOM);
 
   returnMainPageDOM.addEventListener('click', () => {
+    clearRoomUrl();
     renderMain();
   });
 
@@ -271,6 +273,8 @@ function buildCreatePlayerScreen(game, idGame) {
 }
 
 export async function renderCreatePlayer(idGame) {
+  setRoomUrl(idGame);
+
   const oldRoot = document.getElementById('content');
   const loadingRoot = document.createElement('div');
   loadingRoot.id = 'content';

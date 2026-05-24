@@ -11,6 +11,7 @@ import logo from '../resources/logofull.webp';
 import { renderMapSelector } from './renderMapSelector';
 import { createGameSettings } from './createGame';
 import { addGameToGlobalController } from './createGameController';
+import { clearRoomUrl, setRoomUrl } from './roomRouting';
 
 export function renderCreateGame() {
   const oldRoot = document.getElementById('content');
@@ -30,6 +31,7 @@ export function renderCreateGame() {
 
   // EVENT LISTENER FOR RETURNING TO MAIN PAGE
   returnMainPageDOM.addEventListener('click', () => {
+    clearRoomUrl();
     renderMain();
   });
 
@@ -292,6 +294,7 @@ export function renderCreateGame() {
     selectMapButtonDOM.disabled = true;
     try {
       await addGameToGlobalController(gameSettings);
+      setRoomUrl(gameSettings.id);
       renderMapSelector(gameSettings.id);
     } finally {
       selectMapButtonDOM.disabled = false;

@@ -61,7 +61,7 @@ function playerDisconnectRef(gameId, playerId) {
 
 export function cancelDisconnectGrace() {
   if (activeDisconnectCancel) {
-    activeDisconnectCancel();
+    activeDisconnectCancel.cancel().catch(() => {});
     activeDisconnectCancel = null;
   }
 }
