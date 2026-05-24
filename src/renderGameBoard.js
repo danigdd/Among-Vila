@@ -12,12 +12,11 @@ import {
   subscribeToGame,
 } from './gamesFirebase';
 import { clearRoomUrl, setRoomUrl } from './roomRouting';
-import { createWorker, PSM } from 'tesseract.js';
+import Tesseract from 'tesseract.js';
 import '../styles/general-styles.css';
 import '../styles/gameBoard-styles.css';
 
 let gameBoardUnsubscribe = null;
-let ocrWorkerPromise = null;
 
 function unsubscribeFromGameBoard() {
   if (gameBoardUnsubscribe) {
@@ -47,7 +46,10 @@ function getMissionTarget(game) {
   const innocentCount = game.currentPlayers.filter(
     (player) => player.role === 'innocent'
   ).length;
-  return Math.max(innocentCount, innocentCount * 5 - Math.ceil(innocentCount / 2));
+  return Math.max(
+    innocentCount,
+    innocentCount * 5 - Math.ceil(innocentCount / 2)
+  );
 }
 
 function normalizeMissionText(text) {
@@ -58,28 +60,42 @@ function normalizeMissionText(text) {
     .toUpperCase();
 }
 
-function normalizeOcrText(text) {
-  return normalizeMissionText(text)
-    .replaceAll('O', '0')
-    .replaceAll('Q', '0')
-    .replaceAll('I', '1')
-    .replaceAll('L', '1')
-    .replaceAll('S', '5')
-    .replaceAll('Z', '2');
-}
-
-function getDoorCodes(text) {
-  return normalizeOcrText(text).match(/[A-HK][0-3][0-1][0-9]/g) || [];
-}
-
-function isMissionTextDetected(detectedText, missionCode) {
+function isMissionTextDetected(detectedCode, missionCode) {
+  const detectedNorm = normalizeMissionText(detectedCode);
   const missionNorm = normalizeMissionText(missionCode);
+  return detectedNorm.includes(missionNorm);
+}
 
-  if (missionNorm === 'PISCINA' || missionNorm === 'FUTBOL') {
-    return normalizeMissionText(detectedText).includes(missionNorm);
+async function readCodeFromImage(canvas) {
+  try {
+    const imageUrl = canvas.toDataURL('image/jpeg', 0.92);
+    console.log('Iniciando OCR con Tesseract.js...');
+
+    const result = await Tesseract.recognize(imageUrl, 'eng', {
+      logger: (m) => console.log('Tesseract progress:', m),
+    });
+
+    let extractedText = result.data.text.trim();
+    console.log('Tesseract texto extraído:', extractedText);
+
+    // Limpiar el texto: solo mantener caracteres alfanuméricos
+    extractedText = extractedText.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+    console.log('Texto limpio:', extractedText);
+
+    return extractedText || '';
+  } catch (error) {
+    console.error('Error en OCR con Tesseract:', error);
+    return '';
   }
+}
 
-  return getDoorCodes(detectedText).includes(missionNorm);
+function captureVideoFrame(video) {
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+  return canvas;
 }
 
 function createCameraIcon() {
@@ -107,7 +123,10 @@ function getCameraErrorMessage(error) {
     return 'Brave ha bloqueado la cámara. Activa el permiso de cámara para este sitio.';
   }
 
-  if (error?.name === 'NotFoundError' || error?.name === 'OverconstrainedError') {
+  if (
+    error?.name === 'NotFoundError' ||
+    error?.name === 'OverconstrainedError'
+  ) {
     return 'No encuentro una cámara disponible en este dispositivo.';
   }
 
@@ -116,56 +135,6 @@ function getCameraErrorMessage(error) {
   }
 
   return 'Tienes que activar la cámara para jugar';
-}
-
-async function readTextFromImage(canvas) {
-  if (!ocrWorkerPromise) {
-    ocrWorkerPromise = createWorker('eng').then(async (worker) => {
-      await worker.setParameters({
-        tessedit_char_whitelist: 'ABCDEFGHK0123456789PISCNAFUTBOL',
-        tessedit_pageseg_mode: PSM.SINGLE_LINE,
-      });
-      return worker;
-    });
-  }
-
-  const worker = await ocrWorkerPromise;
-  const { data } = await worker.recognize(canvas);
-  return data.text;
-}
-
-function createProcessedTextCanvas(sourceCanvas) {
-  const scale = 2;
-  const canvas = document.createElement('canvas');
-  canvas.width = sourceCanvas.width * scale;
-  canvas.height = sourceCanvas.height * scale;
-
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  ctx.drawImage(sourceCanvas, 0, 0, canvas.width, canvas.height);
-
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const { data } = imageData;
-
-  for (let index = 0; index < data.length; index += 4) {
-    const gray = data[index] * 0.299 + data[index + 1] * 0.587 + data[index + 2] * 0.114;
-    const contrast = gray > 145 ? 255 : 0;
-    data[index] = contrast;
-    data[index + 1] = contrast;
-    data[index + 2] = contrast;
-  }
-
-  ctx.putImageData(imageData, 0, 0);
-  return canvas;
-}
-
-function captureVideoFrame(video) {
-  const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas
-    .getContext('2d')
-    .drawImage(video, 0, 0, canvas.width, canvas.height);
-  return canvas;
 }
 
 async function startCameraStream(ui) {
@@ -197,7 +166,8 @@ function closeCamera(ui) {
 }
 
 async function switchCamera(ui) {
-  ui.cameraFacingMode = ui.cameraFacingMode === 'environment' ? 'user' : 'environment';
+  ui.cameraFacingMode =
+    ui.cameraFacingMode === 'environment' ? 'user' : 'environment';
   stopCameraStream(ui.cameraStream);
 
   try {
@@ -250,29 +220,33 @@ async function openMissionCamera(mission, index, gameId, playerId, ui) {
 
   ui.captureCameraButtonDOM.onclick = async () => {
     ui.captureCameraButtonDOM.disabled = true;
-    ui.captureCameraButtonDOM.textContent = 'Leyendo...';
+    ui.captureCameraButtonDOM.textContent = 'Analizando...';
+    ui.cameraMessageDOM.textContent = '';
 
     const canvas = captureVideoFrame(ui.cameraVideoDOM);
-    const processedCanvas = createProcessedTextCanvas(canvas);
 
-    let detectedText;
+    let detectedCode = '';
     try {
-      detectedText = await readTextFromImage(processedCanvas);
-    } catch {
-      detectedText = '';
+      detectedCode = await readCodeFromImage(canvas);
+    } catch (err) {
+      console.error('Error readCodeFromImage:', err);
+      ui.cameraMessageDOM.textContent = `Error: ${err.message}`;
+      ui.captureCameraButtonDOM.disabled = false;
+      ui.captureCameraButtonDOM.textContent = 'Hacer foto';
+      return;
     } finally {
       ui.captureCameraButtonDOM.disabled = false;
       ui.captureCameraButtonDOM.textContent = 'Hacer foto';
     }
 
-    if (!detectedText) {
-      ui.cameraMessageDOM.textContent =
-        'No puedo leer texto en esta foto. Acércate más y centra el número.';
-      return;
-    }
+    ui.cameraMessageDOM.textContent = detectedCode
+      ? `Leído: ${detectedCode}`
+      : 'No se detectó ningún código en la imagen.';
 
-    if (!isMissionTextDetected(detectedText, mission.code)) {
-      ui.cameraMessageDOM.textContent = 'Misión errónea';
+    if (!detectedCode) return;
+
+    if (!isMissionTextDetected(detectedCode, mission.code)) {
+      ui.cameraMessageDOM.textContent = `Misión errónea (leído: ${detectedCode})`;
       return;
     }
 
