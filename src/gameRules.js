@@ -1,5 +1,5 @@
 export const MIN_PLAYERS_TO_START = 4;
-export const DISCONNECT_GRACE_MS = 30_000;
+export const DISCONNECT_GRACE_MS = 180_000;
 
 export function getMaxPlayers(game) {
   const max = parseInt(game?.numberPlayers, 10);

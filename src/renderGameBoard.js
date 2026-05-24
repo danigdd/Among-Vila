@@ -3,7 +3,7 @@ import {
   findGameById,
   purgeExpiredPlayers,
   syncGameInCache,
-  togglePlayerMission,
+  completePlayerMission,
 } from './createGameController';
 import { clearCurrentSession, getCurrentSession } from './sessionContext';
 import {
@@ -48,6 +48,14 @@ function getMissionTarget(game) {
   return Math.max(innocentCount, innocentCount * 5 - Math.ceil(innocentCount / 2));
 }
 
+function normalizeMissionText(text) {
+  return (text || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toUpperCase();
+}
+
 function createCameraIcon() {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 20 20');
@@ -64,7 +72,116 @@ function createCameraIcon() {
   return svg;
 }
 
-function createMissionRow(mission, index, gameId, playerId) {
+function stopCameraStream(stream) {
+  stream?.getTracks().forEach((track) => track.stop());
+}
+
+function getCameraErrorMessage(error) {
+  if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') {
+    return 'Brave ha bloqueado la cámara. Activa el permiso de cámara para este sitio.';
+  }
+
+  if (error?.name === 'NotFoundError' || error?.name === 'OverconstrainedError') {
+    return 'No encuentro una cámara disponible en este dispositivo.';
+  }
+
+  if (error?.name === 'NotReadableError') {
+    return 'La cámara está ocupada por otra app. Ciérrala y vuelve a intentarlo.';
+  }
+
+  return 'Tienes que activar la cámara para jugar';
+}
+
+async function readTextFromImage(canvas) {
+  if (!('TextDetector' in window)) {
+    return null;
+  }
+
+  const detector = new window.TextDetector();
+  const textBlocks = await detector.detect(canvas);
+  return textBlocks.map((block) => block.rawValue).join(' ');
+}
+
+async function openMissionCamera(mission, index, gameId, playerId, ui) {
+  if (mission.completed) return;
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    ui.cameraMessageDOM.textContent =
+      'Este navegador no permite pedir cámara desde aquí. Prueba Safari/Chrome o revisa permisos de Brave.';
+    return;
+  }
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: true,
+    });
+  } catch (error) {
+    ui.cameraMessageDOM.textContent = getCameraErrorMessage(error);
+    return;
+  }
+
+  ui.cameraMessageDOM.textContent = '';
+  ui.cameraModalDOM.style.display = 'flex';
+  ui.cameraVideoDOM.srcObject = stream;
+  ui.cameraVideoDOM.muted = true;
+
+  try {
+    await ui.cameraVideoDOM.play();
+  } catch (error) {
+    stopCameraStream(stream);
+    ui.cameraVideoDOM.srcObject = null;
+    ui.cameraModalDOM.style.display = 'none';
+    ui.cameraMessageDOM.textContent = getCameraErrorMessage(error);
+    return;
+  }
+
+  ui.closeCameraButtonDOM.onclick = () => {
+    stopCameraStream(stream);
+    ui.cameraVideoDOM.srcObject = null;
+    ui.cameraModalDOM.style.display = 'none';
+    ui.cameraMessageDOM.textContent = '';
+  };
+
+  ui.captureCameraButtonDOM.onclick = async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = ui.cameraVideoDOM.videoWidth;
+    canvas.height = ui.cameraVideoDOM.videoHeight;
+    canvas
+      .getContext('2d')
+      .drawImage(ui.cameraVideoDOM, 0, 0, canvas.width, canvas.height);
+
+    let detectedText;
+    try {
+      detectedText = await readTextFromImage(canvas);
+    } catch {
+      detectedText = '';
+    }
+
+    if (!detectedText) {
+      ui.cameraMessageDOM.textContent =
+        'No puedo leer texto en esta cámara. Activa la cámara y enfoca bien la puerta.';
+      return;
+    }
+
+    const detectedNorm = normalizeMissionText(detectedText);
+    const missionNorm = normalizeMissionText(mission.code);
+
+    if (!detectedNorm.includes(missionNorm)) {
+      ui.cameraMessageDOM.textContent = 'Misión errónea';
+      return;
+    }
+
+    await completePlayerMission(gameId, playerId, index);
+    stopCameraStream(stream);
+    ui.cameraVideoDOM.srcObject = null;
+    ui.cameraModalDOM.style.display = 'none';
+    ui.cameraMessageDOM.textContent = '';
+  };
+}
+
+function createMissionRow(mission, index, gameId, playerId, ui) {
   const rowDOM = document.createElement('div');
   rowDOM.className = mission.completed
     ? 'missionRow missionCompleted'
@@ -74,18 +191,19 @@ function createMissionRow(mission, index, gameId, playerId) {
   missionButtonDOM.type = 'button';
   missionButtonDOM.className = 'missionCodeButton';
   missionButtonDOM.textContent = mission.code;
-  missionButtonDOM.addEventListener('click', async () => {
-    missionButtonDOM.disabled = true;
-    await togglePlayerMission(gameId, playerId, index);
-  });
+  missionButtonDOM.disabled = true;
   rowDOM.appendChild(missionButtonDOM);
 
   const cameraButtonDOM = document.createElement('button');
   cameraButtonDOM.type = 'button';
   cameraButtonDOM.className = 'missionCameraButton';
+  cameraButtonDOM.disabled = mission.completed;
   cameraButtonDOM.title = 'Abrir cámara';
   cameraButtonDOM.setAttribute('aria-label', 'Abrir cámara');
   cameraButtonDOM.appendChild(createCameraIcon());
+  cameraButtonDOM.addEventListener('click', () => {
+    openMissionCamera(mission, index, gameId, playerId, ui);
+  });
   rowDOM.appendChild(cameraButtonDOM);
 
   return rowDOM;
@@ -119,7 +237,7 @@ function updateGameBoard(game, playerId, ui) {
 
     playerMissions.forEach((mission, index) => {
       ui.missionListDOM.appendChild(
-        createMissionRow(mission, index, game.id, playerId)
+        createMissionRow(mission, index, game.id, playerId, ui)
       );
     });
   }
@@ -227,6 +345,11 @@ export function renderGameBoard(id) {
   emergencyCounterDOM.id = 'emergencyCounter_id';
   actionZoneDOM.appendChild(emergencyCounterDOM);
 
+  const emergencyLabelDOM = document.createElement('div');
+  emergencyLabelDOM.id = 'emergencyLabel_id';
+  emergencyLabelDOM.textContent = '¡Emergencia!';
+  actionZoneDOM.appendChild(emergencyLabelDOM);
+
   const innocentActionsDOM = document.createElement('div');
   innocentActionsDOM.className = 'playerActionButtons';
   actionZoneDOM.appendChild(innocentActionsDOM);
@@ -253,8 +376,49 @@ export function renderGameBoard(id) {
   sabotageButtonDOM.textContent = 'Sabotear';
   impostorActionsDOM.appendChild(sabotageButtonDOM);
 
+  const cameraMessageDOM = document.createElement('div');
+  cameraMessageDOM.id = 'cameraMessage_id';
+  root.appendChild(cameraMessageDOM);
+
+  const cameraModalDOM = document.createElement('div');
+  cameraModalDOM.id = 'cameraModal_id';
+  cameraModalDOM.style.display = 'none';
+  root.appendChild(cameraModalDOM);
+
+  const cameraPanelDOM = document.createElement('div');
+  cameraPanelDOM.id = 'cameraPanel_id';
+  cameraModalDOM.appendChild(cameraPanelDOM);
+
+  const cameraVideoDOM = document.createElement('video');
+  cameraVideoDOM.id = 'cameraVideo_id';
+  cameraVideoDOM.autoplay = true;
+  cameraVideoDOM.muted = true;
+  cameraVideoDOM.playsInline = true;
+  cameraPanelDOM.appendChild(cameraVideoDOM);
+
+  const cameraActionsDOM = document.createElement('div');
+  cameraActionsDOM.id = 'cameraActions_id';
+  cameraPanelDOM.appendChild(cameraActionsDOM);
+
+  const captureCameraButtonDOM = document.createElement('button');
+  captureCameraButtonDOM.type = 'button';
+  captureCameraButtonDOM.className = 'roundActionButton reportButton';
+  captureCameraButtonDOM.textContent = 'Hacer foto';
+  cameraActionsDOM.appendChild(captureCameraButtonDOM);
+
+  const closeCameraButtonDOM = document.createElement('button');
+  closeCameraButtonDOM.type = 'button';
+  closeCameraButtonDOM.className = 'roundActionButton sabotageButton';
+  closeCameraButtonDOM.textContent = 'Cerrar';
+  cameraActionsDOM.appendChild(closeCameraButtonDOM);
+
   const ui = {
     emergencyCounterDOM,
+    cameraMessageDOM,
+    cameraModalDOM,
+    cameraVideoDOM,
+    captureCameraButtonDOM,
+    closeCameraButtonDOM,
     globalMissionBarDOM,
     globalMissionCounterDOM,
     impostorActionsDOM,

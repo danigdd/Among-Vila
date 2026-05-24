@@ -42,6 +42,10 @@ export async function addGameToGlobalController(game) {
 export async function purgeExpiredPlayers(game) {
   if (!game) return { game: null, gameDeleted: true };
 
+  if (game.phase === 'inGame') {
+    return { game, gameDeleted: false };
+  }
+
   const expired = [];
   const remaining = [];
 
@@ -226,22 +230,49 @@ function shufflePlayers(players) {
   return shuffled;
 }
 
-const MISSION_BLOCKS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K'];
 const MISSION_FLOORS = [0, 1, 2, 3];
 const MISSIONS_PER_PLAYER = 5;
 
-function createMissionCode() {
-  const block =
-    MISSION_BLOCKS[Math.floor(Math.random() * MISSION_BLOCKS.length)];
+function getMissionSources(maps) {
+  const sources = [];
+
+  (maps || []).forEach((map) => {
+    const blockMatch = map.match(/^Bloque ([A-HK])$/);
+    if (blockMatch) {
+      sources.push({ type: 'block', value: blockMatch[1] });
+      return;
+    }
+
+    if (map === 'Piscina' || map === 'Futbol') {
+      sources.push({ type: 'fixed', value: map });
+    }
+  });
+
+  if (sources.length > 0) return sources;
+
+  return ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K'].map((block) => ({
+    type: 'block',
+    value: block,
+  }));
+}
+
+function createMissionCode(maps) {
+  const sources = getMissionSources(maps);
+  const source = sources[Math.floor(Math.random() * sources.length)];
+
+  if (source.type === 'fixed') {
+    return source.value;
+  }
+
   const floor =
     MISSION_FLOORS[Math.floor(Math.random() * MISSION_FLOORS.length)];
   const door = Math.floor(Math.random() * 12) + 1;
-  return `${block}${floor}${String(door).padStart(2, '0')}`;
+  return `${source.value}${floor}${String(door).padStart(2, '0')}`;
 }
 
-function createPlayerMissions() {
+function createPlayerMissions(maps) {
   return Array.from({ length: MISSIONS_PER_PLAYER }, () => ({
-    code: createMissionCode(),
+    code: createMissionCode(maps),
     completed: false,
   }));
 }
@@ -275,7 +306,7 @@ export async function startRoleReveal(gameId, hostPlayerId) {
     ...player,
     role: impostors.has(player.id) ? 'impostor' : 'innocent',
     roleRevealed: false,
-    missions: createPlayerMissions(),
+    missions: createPlayerMissions(game.maps),
     emergencyUses: 0,
   }));
   const innocentCount = game.currentPlayers.filter(
@@ -291,7 +322,7 @@ export async function startRoleReveal(gameId, hostPlayerId) {
   return { success: true };
 }
 
-export async function togglePlayerMission(gameId, playerId, missionIndex) {
+export async function completePlayerMission(gameId, playerId, missionIndex) {
   const game = (await loadGameWithCleanup(gameId)) || findGameById(gameId);
 
   if (!game || game.phase !== 'inGame') {
@@ -308,7 +339,7 @@ export async function togglePlayerMission(gameId, playerId, missionIndex) {
     return { success: false };
   }
 
-  mission.completed = !mission.completed;
+  mission.completed = true;
   await persistGame(game);
   return { success: true };
 }
