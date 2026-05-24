@@ -66,25 +66,65 @@ function isMissionTextDetected(detectedCode, missionCode) {
   return detectedNorm.includes(missionNorm);
 }
 
-// Preprocesar imagen para mejorar OCR: aumentar contraste y brillo
-function preprocessImageForOCR(canvas) {
+// Binarización agresiva: convertir a blanco/negro puro para eliminar ruido
+function binarizeImage(canvas) {
   const ctx = canvas.getContext('2d');
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
 
-  const contrast = 1.5;
-  const brightness = 20;
-
+  // Convertir a escala de grises primero
   for (let i = 0; i < data.length; i += 4) {
-    data[i] = Math.min(255, Math.max(0, data[i] * contrast + brightness));
-    data[i + 1] = Math.min(
-      255,
-      Math.max(0, data[i + 1] * contrast + brightness)
-    );
-    data[i + 2] = Math.min(
-      255,
-      Math.max(0, data[i + 2] * contrast + brightness)
-    );
+    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+    data[i] = gray;
+    data[i + 1] = gray;
+    data[i + 2] = gray;
+  }
+
+  // Calcular threshold automático (Otsu's method simplificado)
+  const histogram = new Array(256).fill(0);
+  for (let i = 0; i < data.length; i += 4) {
+    histogram[Math.round(data[i])]++;
+  }
+
+  let total = 0;
+  let sum = 0;
+  for (let i = 0; i < 256; i++) {
+    total += histogram[i];
+    sum += i * histogram[i];
+  }
+
+  let sumB = 0;
+  let countB = 0;
+  let maxVar = 0;
+  let threshold = 0;
+
+  for (let i = 0; i < 256; i++) {
+    countB += histogram[i];
+    if (countB === 0) continue;
+
+    const countF = total - countB;
+    if (countF === 0) break;
+
+    sumB += i * histogram[i];
+    const meanB = sumB / countB;
+    const meanF = (sum - sumB) / countF;
+
+    const varBetween = countB * countF * Math.pow(meanB - meanF, 2);
+
+    if (varBetween > maxVar) {
+      maxVar = varBetween;
+      threshold = i;
+    }
+  }
+
+  console.log('Threshold calculado:', threshold);
+
+  // Aplicar threshold binario
+  for (let i = 0; i < data.length; i += 4) {
+    const bw = data[i] > threshold ? 255 : 0;
+    data[i] = bw;
+    data[i + 1] = bw;
+    data[i + 2] = bw;
   }
 
   ctx.putImageData(imageData, 0, 0);
@@ -95,27 +135,35 @@ async function readCodeFromImage(canvas) {
   try {
     console.log('Canvas original:', canvas.width, 'x', canvas.height);
 
-    // Crear canvas aumentado 2x para mejor OCR
+    // Crear canvas aumentado 4x para mejor OCR (más agresivo)
     const scaledCanvas = document.createElement('canvas');
-    scaledCanvas.width = canvas.width * 2;
-    scaledCanvas.height = canvas.height * 2;
+    scaledCanvas.width = canvas.width * 4;
+    scaledCanvas.height = canvas.height * 4;
     const scaledCtx = scaledCanvas.getContext('2d');
     scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
 
-    preprocessImageForOCR(scaledCanvas);
+    // Binarizar agresivamente
+    binarizeImage(scaledCanvas);
 
-    const imageUrl = scaledCanvas.toDataURL('image/jpeg', 0.95);
+    const imageUrl = scaledCanvas.toDataURL('image/png');
     console.log('Iniciando OCR con Tesseract.js...');
 
     const result = await Tesseract.recognize(imageUrl, 'eng', {
       logger: (m) => console.log('Tesseract progress:', m),
-      tessedit_char_whitelist: 'ABCDEFGHK0123456789PISCIFUTBL',
+      tessedit_char_whitelist: 'ABCDEFGHK0123456789',
+      tesseract_create_tsv: true,
     });
 
     let extractedText = result.data.text.trim();
     let confidence = result.data.confidence;
     console.log('Tesseract texto extraído:', extractedText);
     console.log('Confianza OCR:', confidence);
+
+    // Filtrar: solo aceptar resultados con confianza >30%
+    if (confidence < 30) {
+      console.warn('Confianza muy baja, descartando resultado');
+      return '';
+    }
 
     extractedText = extractedText.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 
