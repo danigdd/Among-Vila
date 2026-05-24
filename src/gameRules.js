@@ -1,4 +1,4 @@
-export const MIN_PLAYERS_TO_START = 4;
+export const MIN_PLAYERS_TO_START = 1; // DEBUG: changed from 4 to allow single-player testing
 export const DISCONNECT_GRACE_MS = 180_000;
 
 export function getMaxPlayers(game) {
@@ -20,7 +20,9 @@ export function isPlayerDisconnected(player) {
 }
 
 export function isPlayerInGrace(player) {
-  return isPlayerDisconnected(player) && isWithinGracePeriod(player.disconnectedAt);
+  return (
+    isPlayerDisconnected(player) && isWithinGracePeriod(player.disconnectedAt)
+  );
 }
 
 export function isPlayerActiveInLobby(player) {
@@ -43,7 +45,9 @@ export function getTakenColors(game) {
 
 export function getTakenNames(game) {
   return new Set(
-    (game?.currentPlayers || []).map((player) => normalizePlayerName(player.name))
+    (game?.currentPlayers || []).map((player) =>
+      normalizePlayerName(player.name)
+    )
   );
 }
 
